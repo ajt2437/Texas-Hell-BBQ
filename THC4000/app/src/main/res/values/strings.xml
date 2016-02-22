@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">THC4000</string>
+    <string name="action_settings">Settings</string>
+    <string name="welcome_message">Welcome \nto \nTexas Hell BBQ</string>
+    <string name="not_connected">device not connected</string>
+    <string name="connect_button">Connect</string>
+    <string name="title_activity_smoker_data">SmokerDataActivity</string>
+    <string name="food_label_text">Internal Food Temperature</string>
+    <string name="temp_text">C or F</string>
+    <string name="smoker_label_text">Smoker Temperature</string>
+</resources>
