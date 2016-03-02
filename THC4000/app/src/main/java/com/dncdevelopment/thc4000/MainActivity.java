@@ -3,6 +3,7 @@ package com.dncdevelopment.thc4000;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.database.sqlite.SQLiteTableLockedException;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -18,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> mConversationArrayAdapter;
     private StringBuffer mOutStringBuffer;
     private BluetoothAdapter mBluetoothAdapter = null;
-    private ArrayAdapter<String> mArrayAdapter = null;
+    private ArrayList<String> mDeviceList = new ArrayList<>();
+    private ArrayAdapter<String> mAdapter;
 
 
 
@@ -47,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         //String TAG = "Main Activity";
 
-        //mDevicesBondedList.findViewById(R.id.device_list);
+        mDevicesBondedList = (ListView) findViewById(R.id.device_list);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -63,9 +66,13 @@ public class MainActivity extends AppCompatActivity {
             //Log.e(Tag, "got those bonds");
             for (BluetoothDevice device : pairedDevices) {
                 //Add the name and address to an array adapter to show in a ListView
-                mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+                mDeviceList.add(device.getName() + "\n" + device.getAddress());
             }
         }
+
+        mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mDeviceList);
+        mDevicesBondedList.setAdapter(mAdapter);
+
 
         //mDevicesBondedList.setAdapter(mArrayAdapter);
 
