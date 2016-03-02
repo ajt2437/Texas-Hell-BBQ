@@ -37,6 +37,13 @@
         android:text="@string/not_connected"
         android:background="@drawable/border"
         />
+    <Spinner
+        android:id="@+id/adapter_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/btn_dropdown"
+        android:spinnerMode="dropdown" />
+
 
     <Button
         android:id="@+id/connect_button"
@@ -44,11 +51,13 @@
         android:layout_height="wrap_content"
         android:text="@string/connect_button"
         />
-
+    <!--
     <ListView
         android:id="@+id/device_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </ListView>
+    -->
+
 
 </LinearLayout>

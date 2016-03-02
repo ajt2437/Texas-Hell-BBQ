@@ -13,16 +13,20 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnItemSelectedListener {
 
     private static final int REQUEST_ENABLE_BT = 3;
 
@@ -41,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> mAdapter;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         //String TAG = "Main Activity";
 
-        mDevicesBondedList = (ListView) findViewById(R.id.device_list);
+        //mDevicesBondedList = (ListView) findViewById(R.id.device_list);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-         //If there are paired devices
+        //If there are paired devices
         if (pairedDevices.size() > 0) {
             // Loop through paired devices
             //Log.e(Tag, "got those bonds");
@@ -69,21 +72,18 @@ public class MainActivity extends AppCompatActivity {
                 mDeviceList.add(device.getName() + "\n" + device.getAddress());
             }
         }
-
+        Spinner spinner = (Spinner) findViewById(R.id.adapter_spinner);
         mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mDeviceList);
-        mDevicesBondedList.setAdapter(mAdapter);
+        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(mAdapter);
 
 
         //mDevicesBondedList.setAdapter(mArrayAdapter);
 
 
-
-
-
         //mConversationArrayAdapter =
 
     }
-
 
 
     @Override
@@ -106,5 +106,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        // On selecting a spinner item
+        String item = parent.getItemAtPosition(position).toString();
+        // Showing selected spinner item
+        Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+    }
+    @Override
+    public void onNothingSelected(AdapterView<?> arg0) {
+        // TODO Auto-generated method stub
     }
 }
