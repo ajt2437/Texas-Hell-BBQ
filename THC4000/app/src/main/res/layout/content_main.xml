@@ -28,15 +28,6 @@
 
         />
 
-    <TextView
-        android:id="@+id/bluetooth_device_connected"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:text="@string/not_connected"
-        android:background="@drawable/border"
-        />
     <Spinner
         android:id="@+id/adapter_spinner"
         android:layout_width="wrap_content"
@@ -51,6 +42,7 @@
         android:layout_height="wrap_content"
         android:text="@string/connect_button"
         />
+
     <!--
     <ListView
         android:id="@+id/device_list"

@@ -26,9 +26,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity implements OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 3;
+    private static final String TAG = "MainActivity";
 
     // Layout Views for testing
     private ListView mConversationView;
@@ -41,8 +42,11 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
     private ArrayAdapter<String> mConversationArrayAdapter;
     private StringBuffer mOutStringBuffer;
     private BluetoothAdapter mBluetoothAdapter = null;
+    private ArrayList<String> macDeviceList = new ArrayList<>();
     private ArrayList<String> mDeviceList = new ArrayList<>();
     private ArrayAdapter<String> mAdapter;
+    private String passedMac = "Not Connected";
+    private Button connectButton;
 
 
     @Override
@@ -67,8 +71,12 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         if (pairedDevices.size() > 0) {
             // Loop through paired devices
             //Log.e(Tag, "got those bonds");
+            mDeviceList.add("Not Connected");
+            macDeviceList.add("Mac Not Found");
+
             for (BluetoothDevice device : pairedDevices) {
                 //Add the name and address to an array adapter to show in a ListView
+                macDeviceList.add(device.getAddress());
                 mDeviceList.add(device.getName() + "\n" + device.getAddress());
             }
         }
@@ -76,7 +84,31 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mDeviceList);
         mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(mAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //save the passed mac address
+                passedMac = macDeviceList.get(position);
+                Log.d(TAG, "inside onItemSelected");
+                // On selecting a spinner item
+                String item = parent.getItemAtPosition(position).toString();
+                // Showing selected spinner item
+                Toast.makeText(getApplicationContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
 
+        connectButton = (Button) findViewById(R.id.connect_button);
+
+        connectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), passedMac, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         //mDevicesBondedList.setAdapter(mArrayAdapter);
 
@@ -106,17 +138,5 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // On selecting a spinner item
-        String item = parent.getItemAtPosition(position).toString();
-        // Showing selected spinner item
-        Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
-    }
-    @Override
-    public void onNothingSelected(AdapterView<?> arg0) {
-        // TODO Auto-generated method stub
     }
 }
