@@ -32,9 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     // Layout Views for testing
-    private ListView mConversationView;
-    private EditText mOutEditText;
-    private Button mSendButton;
     private ImageView mBackgroundImage;
 
     private ListView mDevicesBondedList;
@@ -105,11 +102,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), passedMac, Toast.LENGTH_SHORT).show();
             }
         });
-
-        //mDevicesBondedList.setAdapter(mArrayAdapter);
-
-
-        //mConversationArrayAdapter =
 
     }
 
