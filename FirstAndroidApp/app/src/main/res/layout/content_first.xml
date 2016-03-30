@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.practiceapp1.nathan.firstandroidapp.FirstActivity"
+    android:backgroundTint="#b4b0b0"
+    android:nestedScrollingEnabled="true">
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mySwitch"
+        android:checked="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:showText="true"
+        android:splitTrack="true"
+        android:background="@drawable/btn_toggle" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="600 degrees Fahrenheit"
+        android:id="@+id/textView"
+        android:textSize="26sp"
+        android:padding="10dp"
+        android:background="@drawable/backoutline"
+        android:layout_below="@+id/textView4"
+        android:layout_centerHorizontal="true" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="600 degrees Fahrenheit"
+        android:id="@+id/textView3"
+        android:textSize="26sp"
+        android:padding="10dp"
+        android:background="@drawable/backoutline"
+        android:layout_below="@+id/textView5"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="08:02:59"
+        android:id="@+id/textView2"
+        android:textSize="26sp"
+        android:padding="10dp"
+        android:background="@drawable/backoutline"
+        android:layout_below="@+id/textView6"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Internal Temperature"
+        android:id="@+id/textView4"
+        android:layout_below="@+id/mySwitch"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:layout_marginTop="56dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="External Temperature"
+        android:id="@+id/textView5"
+        android:layout_below="@+id/textView"
+        android:layout_alignLeft="@+id/textView3"
+        android:layout_alignStart="@+id/textView3"
+        android:layout_marginTop="39dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Alarm TIme"
+        android:id="@+id/textView6"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner1"
+        android:verticalScrollbarPosition="left"
+        android:background="@drawable/backoutline"
+        android:scrollbarThumbVertical="@drawable/scrollbar_style"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/mySwitch"
+        android:layout_alignLeft="@+id/textView6"
+        android:layout_alignStart="@+id/textView6"
+        android:spinnerMode="dialog"
+        android:layout_above="@+id/textView4"
+        android:singleLine="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SendDataToActivity"
+        android:id="@+id/button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="sendMessage"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Alarm:"
+        android:id="@+id/textView8"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/spinner1"
+        android:layout_above="@+id/textView4"
+        android:textSize="20sp" />
+
+</RelativeLayout>
