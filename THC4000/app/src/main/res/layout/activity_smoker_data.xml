@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:drawableRight="@android:drawable/stat_sys_data_bluetooth"
-        android:text="Connect!"/>
+        android:text="@string/connect_label_button"/>
 
     <TextView
         android:id="@+id/message_text_view"

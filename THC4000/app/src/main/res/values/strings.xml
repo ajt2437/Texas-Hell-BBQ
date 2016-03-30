@@ -8,4 +8,5 @@
     <string name="food_label_text">Internal Food Temperature</string>
     <string name="temp_text">C or F</string>
     <string name="smoker_label_text">Smoker Temperature</string>
+    <string name="connect_label_button">Connect!</string>
 </resources>

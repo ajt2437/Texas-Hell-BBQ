@@ -2,21 +2,17 @@ package com.dncdevelopment.thc4000;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteTableLockedException;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -28,23 +24,26 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final static int REQUEST_DISCOVERABLE = 2;
     private static final int REQUEST_ENABLE_BT = 3;
     private static final String TAG = "MainActivity";
 
     // Layout Views for testing
-    private ImageView mBackgroundImage;
 
     private ListView mDevicesBondedList;
 
-    private ArrayAdapter<String> mConversationArrayAdapter;
-    private StringBuffer mOutStringBuffer;
     private BluetoothAdapter mBluetoothAdapter = null;
-    private ArrayList<String> mMACList = new ArrayList<>();
     private ArrayList<String> mDeviceList = new ArrayList<>();
+    private ArrayList<BluetoothDevice> mDiscoveredDevices = new ArrayList<>();
+    private ArrayList<BluetoothDevice> mPairedDevices = new ArrayList<>();
     private ArrayAdapter<String> mAdapter;
-    private String passedMac = "Not Connected";
-    private Button connectButton;
+    private BluetoothDevice passedMac = null;
+    private Button mConnectButton;
+    private Button mScanButton;
+    private Spinner mSpinner;
 
+    /* Register Receiver*/
+    private IntentFilter discoveryFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,68 +62,90 @@ public class MainActivity extends AppCompatActivity {
         if (pairedDevices.size() > 0) {
             // Loop through paired devices
             //Log.e(Tag, "got those bonds");
-            mDeviceList.add("Not Connected");
-            mMACList.add("Mac Not Found");
 
             for (BluetoothDevice device : pairedDevices) {
                 //Add the name and address to an array adapter to show in a ListView
-                mMACList.add(device.getAddress());
+                mPairedDevices.add(device);
                 mDeviceList.add(device.getName());
             }
         }
-        Spinner spinner = (Spinner) findViewById(R.id.adapter_spinner);
-        mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mDeviceList);
-        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(mAdapter);
-        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+        mSpinner = (Spinner) findViewById(R.id.adapter_spinner);
+        mSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 //save the passed mac address
-                passedMac = mMACList.get(position);
-                //Log.d(TAG, "inside onItemSelected");
-                // On selecting a spinner item
-                //String item = parent.getItemAtPosition(position).toString();
-
-                // Showing selected spinner item
-                //Toast.makeText(getApplicationContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+                passedMac = mPairedDevices.get(position);
+                //Toast.makeText(MainActivity.this, passedMac.getName(), Toast.LENGTH_SHORT).show();
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
+                // does nothing
             }
         });
+        updateUI();
 
-        connectButton = (Button) findViewById(R.id.connect_button);
-
-        connectButton.setOnClickListener(new View.OnClickListener() {
+        mConnectButton = (Button) findViewById(R.id.connect_button);
+        mConnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), passedMac, Toast.LENGTH_SHORT).show();
+                Intent i = SmokerDataActivity.newIntent(MainActivity.this, passedMac);
+                startActivity(i);
+                Log.d(TAG, "Testing");
             }
         });
 
+//        mScanButton = (Button) findViewById(R.id.scan_button);
+//        mScanButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                boolean success = mBluetoothAdapter.startDiscovery();
+//
+//                Toast.makeText(MainActivity.this, "Discovery: " + success, Toast.LENGTH_LONG).show();
+//            }
+//        });
     }
 
-
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    protected void onResume() {
+        super.onResume();
+        this.registerReceiver(mReceiver, discoveryFilter);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(mReceiver);
+    }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    // Create a BroadcastReceiver for ACTION_FOUND
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            // When discovery finds a device
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // Get the BluetoothDevice object from the Intent
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                // Add the name and address to an array adapter to show in a ListView
+                mDiscoveredDevices.add(device);
+                mDeviceList.add(device.getName());
+                Toast.makeText(MainActivity.this, "Found new devices", Toast.LENGTH_SHORT).show();
+                updateUI();
+            }
         }
+    };
 
-        return super.onOptionsItemSelected(item);
+    private void updateUI() {
+
+        if(mAdapter == null) {
+            mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mDeviceList);
+            mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mSpinner.setAdapter(mAdapter);
+        }
+        else {
+            mAdapter.notifyDataSetChanged();
+        }
     }
+
 }
