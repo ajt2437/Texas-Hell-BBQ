@@ -9,4 +9,7 @@
     <string name="temp_text">C or F</string>
     <string name="smoker_label_text">Smoker Temperature</string>
     <string name="connect_label_button">Connect!</string>
+    <string name="internal_temperature_label">Internal Temperature</string>
+    <string name="temperature_example">600 degrees Fahrenheit</string>
+    <string name="external_temperature_label">External Temperature</string>
 </resources>

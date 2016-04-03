@@ -6,13 +6,15 @@ public class test1
 	public static final String LOW_TEMPERATURE = "Hey the Smoker is going way to high!!";
 	public static final String FOOD_READY = "Hey the Smoker is going way to high!!";
 
+ITemp,99.562,/ITemp
+ITemp,99.562,/ITempITemp,95.4,/ITempITemp,99.0,/ITemp
 	
 	
 	public static void main(String[] args){
-		stringHandler("ITemp,99.562,ITemp");
-		stringHandler("ETemp,99.1234,asdf,ITemp");
-		stringHandler("ETemp,913.123,ETemp");
-		stringHandler("Error,TemperatureHigh,Error");
+		stringHandler("ITemp,99.562,/ITemp");
+		stringHandler("ETemp,99.1234,asdf,/ITemp");
+		stringHandler("ETemp,913.123,/ETemp");
+		stringHandler("Error,TemperatureHigh,/Error");
 	}
 	public static void stringHandler(String bluetoothInput){
 		//need to parse first
