@@ -13,15 +13,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/bluetooth_status_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableRight="@android:drawable/stat_sys_data_bluetooth"
-            android:text="check status"
-            android:layout_weight="1"
-            />
-
         <TextView
             android:id="@+id/bluetooth_status_text_view"
             android:layout_width="wrap_content"
@@ -41,13 +32,6 @@
         android:textSize="20sp"
         android:layout_marginBottom="30dp"
         tools:text="message status here"/>
-
-    <Button
-        android:id="@+id/clear_buffer_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="clear buffer"
-        android:layout_gravity="center"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -83,11 +67,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="08:02:59"
-            android:id="@+id/textView2"
+            android:text="06:59:59"
+            android:id="@+id/timer_text_view"
             android:textSize="26sp"
             android:padding="10dp"
-            android:background="@drawable/backoutline"
             android:layout_below="@+id/timer_label"
             android:layout_centerHorizontal="true" />
 
