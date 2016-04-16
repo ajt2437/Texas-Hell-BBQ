@@ -6,14 +6,28 @@ package com.dncdevelopment.thc4000;
 public class Parser {
 
     public static final String HOT_TEMPERATURE = "Hey the Smoker is going way to high!!";
-    public static final String LOW_TEMPERATURE = "Hey the Smoker is going way to high!!";
+    public static final String LOW_TEMPERATURE = "Hey the Smoker is going way to low!!";
     public static final String FOOD_READY = "Hey the Smoker is going way to high!!";
 
+    public static final String startData = "Data";
     public static final String startTimeTag = "Time";
     public static final String startITempTag = "ITemp";
     public static final String startETempTag = "ETemp";
     public static final String startErrorTag = "Error";
 
+
+    public static boolean foundDataTag (String bluetoothInput) {
+        int i = 0;
+        int inputLen = bluetoothInput.length();
+        int dataLen = startData.length();
+        while (i + dataLen < inputLen) {
+            String context = bluetoothInput.substring(i, i + dataLen);
+            if (startData.equals(context)) {
+                return true;
+            }
+        }
+        return false;
+    }
     public static String[] stringHandler(String bluetoothInput){
         //need to parse first
         String[] token = new String[4];

@@ -1,5 +1,6 @@
 package com.dncdevelopment.thc4000;
 
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -67,6 +68,10 @@ public class SmokerDataActivity extends AppCompatActivity {
 
         mBluetoothDevice = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         mBluetoothStatusTextView.setText("Not Connected");
+
+        // Testing services
+//        boolean shouldStartAlarm = !SmokerDataService.isServiceAlarmOn(getApplicationContext(), mBluetoothDevice);
+//        SmokerDataService.setServiceAlarm(getApplicationContext(), mBluetoothDevice, shouldStartAlarm);
 
         mMessageStatusTextView = (TextView) findViewById(R.id. message_status);
         mMessageStatusTextView.setText("message shown here");
@@ -152,6 +157,10 @@ public class SmokerDataActivity extends AppCompatActivity {
     private void setupChat() {
         mConnectThread = new ConnectThread(mBluetoothDevice);
         mConnectThread.start();
+    }
+
+    public static Intent newIntent(Context context) {
+        return new Intent(context, SmokerDataActivity.class);
     }
 
     public static Intent newIntent(Context packageContext, BluetoothDevice device) {
@@ -292,8 +301,7 @@ public class SmokerDataActivity extends AppCompatActivity {
                                 char currentChar = (char) Integer.parseInt(chars[i]);
                                 if (currentChar != ' ' && currentChar != '\n' && currentChar != '\b' && currentChar != '\t') {
                                     sbu.append((char) Integer.parseInt(chars[i]));
-                                }
-                                else {
+                                } else {
                                     sbu.setLength(0);
                                     str = "";
                                 }
@@ -302,6 +310,9 @@ public class SmokerDataActivity extends AppCompatActivity {
                             str += sbu;
                             mMessageStatusTextView.setText(str);
 
+//                            if (str.contains(Parser.startData)) {
+//                                str = "";
+//                            }
                             // Parse data, identify start and stop tag to know we received all the data to display
                             parseResult = Parser.stringHandler(str);
 
@@ -315,6 +326,7 @@ public class SmokerDataActivity extends AppCompatActivity {
 
                                     case Parser.startTimeTag:
                                         dataI = Integer.parseInt(mMessage);
+                                        write("-".getBytes());
                                         startTimer(dataI);
                                         break;
 
@@ -322,6 +334,7 @@ public class SmokerDataActivity extends AppCompatActivity {
                                         dataD = Double.parseDouble(mMessage);
                                         dataI = (int) Math.ceil(dataD);
                                         mInternalTemperatureTextView.setText("" + dataI);
+                                        write("-".getBytes());
                                         str = "";
                                         break;
 
@@ -329,6 +342,7 @@ public class SmokerDataActivity extends AppCompatActivity {
                                         dataD = Double.parseDouble(mMessage);
                                         dataI = (int) Math.ceil(dataD);
                                         mExternalTemperatureTextView.setText("" + dataI);
+                                        write("-".getBytes());
                                         str = "";
                                         break;
 
@@ -337,6 +351,7 @@ public class SmokerDataActivity extends AppCompatActivity {
                                         break;
                                 }
                             }
+
                         }
                     });
                 }
