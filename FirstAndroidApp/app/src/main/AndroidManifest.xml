@@ -28,14 +28,6 @@
                 android:value="com.practiceapp1.nathan.firstandroidapp.FirstActivity" />
         </activity>
 
-        <service
-            android:name=".TimerService"
-            android:enabled="true"
-            android:exported="true" />
-        <service
-            android:name=".LocalService"
-            android:enabled="true"
-            android:exported="true"></service>
     </application>
 
 </manifest>

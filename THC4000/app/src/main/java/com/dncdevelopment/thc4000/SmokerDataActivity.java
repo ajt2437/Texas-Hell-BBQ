@@ -52,7 +52,6 @@ public class SmokerDataActivity extends AppCompatActivity {
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        mBluetoothStatusTextView = (TextView) findViewById(R.id.bluetooth_status_text_view);
         mStatusCheckButton = (Button) findViewById(R.id.bluetooth_status_button);
 
         mInternalTemperatureTextView = (TextView) findViewById(R.id.internal_temperature_text_view);
