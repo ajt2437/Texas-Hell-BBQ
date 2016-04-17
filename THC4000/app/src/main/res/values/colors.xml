@@ -6,5 +6,10 @@
     <color name="colorTitleText">#CF5300</color>
     <color name="colorTextViewBackground">#FFFFFF</color>
     <color name="colorBorder">#808080</color>
+<<<<<<< HEAD
     <color name="black">#000000</color>
+=======
+    <color name="colorRed">#FF0000</color>
+    <color name="colorBlack">#000000</color>
+>>>>>>> origin/master
 </resources>

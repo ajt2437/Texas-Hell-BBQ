@@ -6,31 +6,38 @@ package com.dncdevelopment.thc4000;
 public class Parser {
 
     public static final String HOT_TEMPERATURE = "Hey the Smoker is going way to high!!";
-    public static final String LOW_TEMPERATURE = "Hey the Smoker is going way to high!!";
+    public static final String LOW_TEMPERATURE = "Hey the Smoker is going way to low!!";
     public static final String FOOD_READY = "Hey the Smoker is going way to high!!";
 
+    public static final String startData = "Data";
     public static final String startTimeTag = "Time";
     public static final String startITempTag = "ITemp";
     public static final String startETempTag = "ETemp";
     public static final String startErrorTag = "Error";
 
-    private static TAGS tagFound = TAGS.NOTFOUND;
 
-    public enum TAGS {
-        TIME,
-        ITEMP,
-        ETEMP,
-        ERROR,
-        NOTFOUND
+    public static boolean foundDataTag (String bluetoothInput) {
+        int i = 0;
+        int inputLen = bluetoothInput.length();
+        int dataLen = startData.length();
+        while (i + dataLen < inputLen) {
+            String context = bluetoothInput.substring(i, i + dataLen);
+            if (startData.equals(context)) {
+                return true;
+            }
+        }
+        return false;
     }
-
-    public static String stringHandler(String bluetoothInput){
+    public static String[] stringHandler(String bluetoothInput){
         //need to parse first
         String[] token = new String[4];
+        String[] result = new String[2];
+        result[0] = null;
+        result[1] = null;
         System.out.println(bluetoothInput);
         token = bluetoothInput.split(",");
-        double data = 0.0;	//this is not how we will use the result... maybe write dummy variables as
-        String message = "";
+        //double data = 0.0;	//this is not how we will use the result... maybe write dummy variables as
+        String message;
         if (token.length > 2) {
             switch (token[0]) {
 			/*
@@ -38,42 +45,33 @@ public class Parser {
 			 */
                 case startTimeTag:
                     if (token[2].equals("/" + startTimeTag)) {
-                        tagFound = TAGS.TIME;
-                        return token[1];
-                    } else {
-                        return "";
+                        result[0] = startTimeTag;
+                        result[1] = token[1];
                     }
                 case startITempTag:
                     if (token[2].equals("/" + startITempTag)) {
-                        tagFound = TAGS.ITEMP;
-                        return token[1];
-                    } else {
-                        return "";
+                        result[0] = startITempTag;
+                        result[1] = token[1];
                     }
                 case startETempTag:
                     if (token[2].equals("/" + startETempTag)) {
-                        tagFound = TAGS.ETEMP;
-                        return token[1];
-                    } else {
-                        return "";
+                        result[0] = startETempTag;
+                        result[1] = token[1];
                     }
+                    break;
                 case startErrorTag:
                     if (token[2].equals("/" + startErrorTag)) {
                         message = userHandler(token);
-                        tagFound = TAGS.ERROR;
-                        //handle String message here;
-                        return message;
-                    } else {
-                        return "";
+                        result[0] = startErrorTag;
+                        result[1] = message;
                     }
+                    break;
                 default:
-                    tagFound = TAGS.NOTFOUND;
-                    return "";
+
             }
         }
-        return "";
+        return result;
     }
-
 
     /*
 	 * function for handling "Error" tags
@@ -95,11 +93,5 @@ public class Parser {
         }
         return message;
     }
-
-    /* getter method for tagFound */
-    public static TAGS getTagFound() {
-        return tagFound;
-    }
-
 
 }
