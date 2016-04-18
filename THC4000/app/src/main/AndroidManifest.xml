@@ -31,6 +31,11 @@
         <service android:name=".SmokerDataService"/>
         <activity android:name=".SmokerDataActivity">
         </activity>
+        <activity
+            android:name=".DeviceListActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/select_device"
+            android:theme="@android:style/Theme.Holo.Dialog"/>
     </application>
 
 </manifest>

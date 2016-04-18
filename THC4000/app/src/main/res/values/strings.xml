@@ -13,4 +13,15 @@
     <string name="temperature_example">600 degrees Fahrenheit</string>
     <string name="external_temperature_label">External Temperature</string>
     <string name="wrong_device_alert">Wrong device selected</string>
+    <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Leaving Bluetooth Chat.</string>
+
+    <!--  DeviceListActivity -->
+    <string name="none_paired">No devices have been paired</string>
+    <string name="scanning">scanning for devices...</string>
+    <string name="select_device">select a device to connect</string>
+    <string name="none_found">No devices found</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
+
 </resources>
