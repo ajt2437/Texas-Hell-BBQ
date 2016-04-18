@@ -1,14 +1,19 @@
 package com.dncdevelopment.thc4000;
 
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +21,8 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import android.os.Handler;
 
@@ -30,20 +37,22 @@ public class SmokerDataActivity extends AppCompatActivity {
     private ConnectedThread mConnectedThread;
     private BluetoothDevice mBluetoothDevice;
     private TextView mBluetoothStatusTextView;
-    private Button mStatusCheckButton;
     private TextView mInternalTemperatureTextView;
     private TextView mExternalTemperatureTextView;
     private TextView mMessageStatusTextView;
-    private Button mClearButton;
+    private TextView mTimerTextView;
 
     // Model
     private StringBuffer sbu;
     private String str = "";
     private String mMessage = "";
-    private Handler mHandler = new Handler();
+    private Handler mReceiverHandler = new Handler();
+    private Handler mResponseHandler = new Handler();
+    private int totalTime = 5;
+    private int timeLeft;
+    private Timer mTimer = new Timer();
+
     private boolean connectedFlag = false;
-    private Parser.TAGS tagId = Parser.TAGS.NOTFOUND;
-    private Parser mParser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +62,6 @@ public class SmokerDataActivity extends AppCompatActivity {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         mBluetoothStatusTextView = (TextView) findViewById(R.id.bluetooth_status_text_view);
-        mStatusCheckButton = (Button) findViewById(R.id.bluetooth_status_button);
 
         mInternalTemperatureTextView = (TextView) findViewById(R.id.internal_temperature_text_view);
         mExternalTemperatureTextView = (TextView) findViewById(R.id.external_temperature_text_view);
@@ -61,39 +69,98 @@ public class SmokerDataActivity extends AppCompatActivity {
         mBluetoothDevice = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         mBluetoothStatusTextView.setText("Not Connected");
 
+        // Testing services
+//        boolean shouldStartAlarm = !SmokerDataService.isServiceAlarmOn(getApplicationContext(), mBluetoothDevice);
+//        SmokerDataService.setServiceAlarm(getApplicationContext(), mBluetoothDevice, shouldStartAlarm);
+
         mMessageStatusTextView = (TextView) findViewById(R.id. message_status);
         mMessageStatusTextView.setText("message shown here");
 
-        mClearButton = (Button) findViewById(R.id.clear_buffer_button);
-        mClearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                str = "";
-                mMessageStatusTextView.setText("message shown here");
-            }
-        });
+        mTimerTextView = (TextView) findViewById(R.id.timer_text_view);
 
         if (mBluetoothAdapter == null) {
             Toast.makeText(getApplicationContext(), "Bluetooth is not available", Toast.LENGTH_LONG).show();
         }
 
-        mStatusCheckButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(SmokerDataActivity.this, mBluetoothDevice.getName() + "\n" + mBluetoothDevice.getAddress(), Toast.LENGTH_SHORT).show();
-                if (connectedFlag) {
-                    mBluetoothStatusTextView.setText("Connected");
-                } else {
-                    mBluetoothStatusTextView.setText("Not Connected");
+        Log.i(TAG, "Background thread started");
+        //startTimer(totalTime);
+        setupChat();
+    }
+
+    private void timerTick() {
+
+        if (timeLeft != 0) {
+            timeLeft--;
+            mTimerTextView.setText(parseTimer());
+            if (timeLeft == 0) {
+                mTimer.cancel();
+                mTimerTextView.setText("00:00:00");
+                mTimerTextView.setTextColor(Color.RED);
+                mTimerTextView.setAlpha(0.5f);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Animation animation = new AlphaAnimation(0.0f, 1.0f);
+                    animation.setDuration(500);
+                    animation.setRepeatMode(Animation.REVERSE);
+                    animation.setRepeatCount(10);
+                    mTimerTextView.startAnimation(animation);
                 }
             }
-        });
-        setupChat();
+        }
+    }
+
+    private void startTimer(int timerValue) {
+        mTimer.cancel();
+        timeLeft = timerValue + 1; // Timer start with one second less so I added the second back
+        TimerTask mTicker = new TimerTask() {
+            @Override
+            public void run() {
+                mResponseHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        timerTick();
+                    }
+                });
+            }
+        };
+        mTimer = new Timer();
+        mTimer.scheduleAtFixedRate(mTicker, 0, 1000);
+    }
+
+    private String parseTimer() {
+        int hours = timeLeft / 3600;
+        int minutes = (timeLeft % 3600) / 60;
+        int seconds = (timeLeft % 3600) % 60;
+
+        String time = "";
+
+        if (hours < 10) {
+            time += "0";
+        }
+
+        time += hours + ":";
+
+        if (minutes < 10) {
+            time += "0";
+        }
+
+        time += minutes + ":";
+
+        if (seconds < 10) {
+            time += "0";
+        }
+
+        time += seconds;
+
+        return time;
     }
 
     private void setupChat() {
         mConnectThread = new ConnectThread(mBluetoothDevice);
         mConnectThread.start();
+    }
+
+    public static Intent newIntent(Context context) {
+        return new Intent(context, SmokerDataActivity.class);
     }
 
     public static Intent newIntent(Context packageContext, BluetoothDevice device) {
@@ -106,6 +173,8 @@ public class SmokerDataActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mConnectThread.cancel();
+        //mParserHandler.quit();
+        Log.i(TAG, "Background thread destroyed");
     }
 
     void manageConnectedSocket(BluetoothSocket socket) {
@@ -160,6 +229,12 @@ public class SmokerDataActivity extends AppCompatActivity {
             //It connected successfully if it reaches this point
             connectedFlag = true;
 
+            mResponseHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mBluetoothStatusTextView.setText("Connected");
+                }
+            });
             // Do work to manage the connection (in a separate thread)
             manageConnectedSocket(mmSocket);
         }
@@ -176,6 +251,7 @@ public class SmokerDataActivity extends AppCompatActivity {
         private final BluetoothSocket mSocket;
         private final InputStream mInputStream;
         private final OutputStream mOutputStream;
+        private String parseResult[];
 
         public ConnectedThread(BluetoothSocket socket) {
             mSocket = socket;
@@ -207,15 +283,8 @@ public class SmokerDataActivity extends AppCompatActivity {
 
                     // Send the obtained bytes to the UI activity
                     final int count = bytes;
-                    mHandler.post(new Runnable() {
+                    mReceiverHandler.post(new Runnable() {
                         public void run() {
-
-                            try {
-                                sleep(5);
-                            }
-                            catch (InterruptedException e) {
-                                Log.e(TAG, "Error: Sleep error", e);
-                            }
 
                             // String input together
                             StringBuilder b = new StringBuilder();
@@ -229,55 +298,60 @@ public class SmokerDataActivity extends AppCompatActivity {
                             String[] chars = s.split(",");
                             sbu = new StringBuffer();
                             for (int i = 0; i < chars.length; i++) {
-                                sbu.append((char) Integer.parseInt(chars[i]));
+                                char currentChar = (char) Integer.parseInt(chars[i]);
+                                if (currentChar != ' ' && currentChar != '\n' && currentChar != '\b' && currentChar != '\t') {
+                                    sbu.append((char) Integer.parseInt(chars[i]));
+                                } else {
+                                    sbu.setLength(0);
+                                    str = "";
+                                }
                             }
 
-                            if (sbu.equals("\n") || sbu.equals("\r") || sbu.equals("\r\n")) {
-                                str = "";
-                                mMessage = "";
-                                mMessageStatusTextView.setText("message shown here");
-                            }
-                            else {
-                                str += sbu;
-                                mMessageStatusTextView.setText(str);
-                            }
+                            str += sbu;
+                            mMessageStatusTextView.setText(str);
 
+//                            if (str.contains(Parser.startData)) {
+//                                str = "";
+//                            }
                             // Parse data, identify start and stop tag to know we received all the data to display
-                            mMessage = mParser.stringHandler(str);
+                            parseResult = Parser.stringHandler(str);
 
-                            tagId = mParser.getTagFound();
+                            if (parseResult[0] != null) {
+                                // Identify the tag and take the correction action
+                                mMessage = parseResult[1];
+                                int dataI;
+                                double dataD;
+                                switch (parseResult[0]) {
+                                    //double dataD;
 
-                            // Identify the tag and take the correction action
-                            switch (tagId) {
-                                //double dataD;
+                                    case Parser.startTimeTag:
+                                        dataI = Integer.parseInt(mMessage);
+                                        write("-".getBytes());
+                                        startTimer(dataI);
+                                        break;
 
-                                case TIME:
+                                    case Parser.startITempTag:
+                                        dataD = Double.parseDouble(mMessage);
+                                        dataI = (int) Math.ceil(dataD);
+                                        mInternalTemperatureTextView.setText("" + dataI);
+                                        write("-".getBytes());
+                                        str = "";
+                                        break;
 
-                                    break;
+                                    case Parser.startETempTag:
+                                        dataD = Double.parseDouble(mMessage);
+                                        dataI = (int) Math.ceil(dataD);
+                                        mExternalTemperatureTextView.setText("" + dataI);
+                                        write("-".getBytes());
+                                        str = "";
+                                        break;
 
-                                case ITEMP:
-                                    double dataD = Double.parseDouble(mMessage);
-                                    int dataI = (int) Math.ceil(dataD);
-                                    mInternalTemperatureTextView.setText("" + dataI);
-                                    str = "";
-                                    mMessage = "";
-                                    break;
+                                    case Parser.startErrorTag:
 
-                                case ETEMP:
-                                    dataD = Double.parseDouble(mMessage);
-                                    dataI = (int) Math.ceil(dataD);
-                                    mExternalTemperatureTextView.setText("" + dataI);
-                                    str = "";
-                                    mMessage = "";
-                                    break;
-
-                                case ERROR:
-
-                                    break;
-
-                                case NOTFOUND:
-                                    //str = "";
+                                        break;
+                                }
                             }
+
                         }
                     });
                 }
