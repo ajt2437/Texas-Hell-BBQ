@@ -66,7 +66,8 @@ public class SmokerDataActivity extends AppCompatActivity {
         mInternalTemperatureTextView = (TextView) findViewById(R.id.internal_temperature_text_view);
         mExternalTemperatureTextView = (TextView) findViewById(R.id.external_temperature_text_view);
 
-        mBluetoothDevice = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        //TODO: Uncomment before pushing
+        //mBluetoothDevice = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         mBluetoothStatusTextView.setText("Not Connected");
 
         // Testing services
@@ -84,7 +85,9 @@ public class SmokerDataActivity extends AppCompatActivity {
 
         Log.i(TAG, "Background thread started");
         //startTimer(totalTime);
-        setupChat();
+
+        //TODO: Uncomment before pushing
+        //setupChat();
     }
 
     private void timerTick() {
