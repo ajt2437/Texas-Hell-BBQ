@@ -6,9 +6,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -37,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<BluetoothDevice> mDiscoveredDevices = new ArrayList<>();
     private ArrayList<BluetoothDevice> mPairedDevices = new ArrayList<>();
     private ArrayAdapter<String> mAdapter;
-    private BluetoothDevice passedMac = null;
+    private BluetoothDevice selectedDevice = null;
     private Button mConnectButton;
     private Button mScanButton;
     private Spinner mSpinner;
@@ -75,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 //save the passed mac address
-                passedMac = mPairedDevices.get(position);
+                selectedDevice = mPairedDevices.get(position);
                 //Toast.makeText(MainActivity.this, passedMac.getName(), Toast.LENGTH_SHORT).show();
             }
 
@@ -90,8 +94,21 @@ public class MainActivity extends AppCompatActivity {
         mConnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = SmokerDataActivity.newIntent(MainActivity.this, passedMac);
-                startActivity(i);
+                if (selectedDevice == null) {
+                    Toast.makeText(MainActivity.this, "Scan for devices", Toast.LENGTH_LONG).show();
+                }
+                else if (selectedDevice.getName().equals("THC-4000")) {
+                    Intent i = SmokerDataActivity.newIntent(MainActivity.this, selectedDevice);
+                    startActivity(i);
+                }
+                else {
+                    Toast message = Toast.makeText(MainActivity.this, R.string.wrong_device_alert, Toast.LENGTH_SHORT);
+                    TextView textView = (TextView) message.getView().findViewById(android.R.id.message);
+                    textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                    textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                    message.show();
+
+                }
                 Log.d(TAG, "Testing");
             }
         });
