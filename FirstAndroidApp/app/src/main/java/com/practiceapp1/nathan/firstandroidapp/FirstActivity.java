@@ -1,8 +1,10 @@
 package com.practiceapp1.nathan.firstandroidapp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -24,7 +26,6 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 
 public class FirstActivity extends AppCompatActivity{
@@ -35,27 +36,31 @@ public class FirstActivity extends AppCompatActivity{
     private ArrayAdapter<String> mAdapter;
     private ArrayList<String> uriList = new ArrayList<String>();
     private ArrayList<String> list = new ArrayList<String>();
-    private Button swapActivity;
     private int listposition;
     private Handler mHandler;
     private int timerValue = 1000;
     private static TextView messaging;
+    private Button sound;
+    private Ringtone r;
+    private MediaPlayer testing;
+    private Uri notification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_first);
+        setContentView(R.layout.content_first);
         RingtoneManager manager = new RingtoneManager(this);
-        manager.setType(RingtoneManager.TYPE_NOTIFICATION);
+        manager.setType(RingtoneManager.TYPE_ALARM);
         Cursor cursor = manager.getCursor();
 
 
         while (cursor.moveToNext()) {
             String notificationTitle = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);
-            String notificationUri = cursor.getString(RingtoneManager.URI_COLUMN_INDEX);
 
             list.add(notificationTitle);
-            uriList.add(notificationUri);
+            String id = cursor.getString(RingtoneManager.ID_COLUMN_INDEX);
+            String uri = cursor.getString(RingtoneManager.URI_COLUMN_INDEX);
+            uriList.add(uri + "/" + id);
         }
         mAdapter = new ArrayAdapter<>(this, R.layout.spinner_dropdown, list);
         mAdapter.setDropDownViewResource(R.layout.spinner_dropdown);
@@ -64,10 +69,14 @@ public class FirstActivity extends AppCompatActivity{
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-               /* Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), Uri.parse(uriList.get(position)));
-                r.play();
-                Toast.makeText(getApplicationContext(), uriList.get(position), Toast.LENGTH_LONG).show(); */
                 listposition = position;
+                notification = Uri.parse(uriList.get(position));
+                if(testing.isPlaying()){
+                    testing.stop();
+                }
+                testing = MediaPlayer.create(getApplicationContext(), notification);
+                testing.setLooping(true);
+
             }
 
             @Override
@@ -76,6 +85,29 @@ public class FirstActivity extends AppCompatActivity{
             }
 
         });
+
+        notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+        testing = MediaPlayer.create(getApplicationContext(), notification);
+        testing.setLooping(true);
+
+
+
+        sound = (Button) findViewById(R.id.soundButton);
+        sound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+               if(testing.isPlaying()){
+                   testing.pause();
+                   testing.seekTo(0);
+               }
+                else{
+                   testing.start();
+               }
+
+            }
+        });
+
 
         mySwitch = (Switch) findViewById(R.id.mySwitch);
         mySwitch.setChecked(true);
@@ -97,16 +129,7 @@ public class FirstActivity extends AppCompatActivity{
         }
 
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
         mHandler = new Handler();
         messaging = (TextView) findViewById (R.id.textView2);
     }

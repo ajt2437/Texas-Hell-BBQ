@@ -23,8 +23,9 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:showText="true"
-        android:splitTrack="true"
-        android:background="@drawable/btn_toggle" />
+        android:thumbTint="@color/blue"
+        android:trackTint="@color/green"
+        android:splitTrack="true"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -126,5 +127,14 @@
         android:layout_toLeftOf="@+id/spinner1"
         android:layout_above="@+id/textView4"
         android:textSize="20sp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test Sound"
+        android:id="@+id/soundButton"
+        android:layout_below="@+id/textView2"
+        android:layout_alignRight="@+id/textView2"
+        android:layout_alignEnd="@+id/textView2" />
 
 </RelativeLayout>
