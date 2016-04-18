@@ -12,5 +12,5 @@
     <string name="internal_temperature_label">Internal Temperature</string>
     <string name="temperature_example">600 degrees Fahrenheit</string>
     <string name="external_temperature_label">External Temperature</string>
-    <string name="wrong_device_alert">Wrong device selected\nSelect THC-4000</string>
+    <string name="wrong_device_alert">Wrong device selected</string>
 </resources>

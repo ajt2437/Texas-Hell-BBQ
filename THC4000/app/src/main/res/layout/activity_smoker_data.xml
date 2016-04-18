@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/background_light"
+    tools:context="com.dncdevelopment.thc4000.SmokerDataActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/bluetooth_status_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Not connected"
+            android:textSize="24sp"
+            android:textAlignment="center"
+            android:layout_weight="3"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/message_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textSize="20sp"
+        android:layout_marginBottom="30dp"
+        tools:text="message status here"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/internal_temperature_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@string/temperature_example"
+            android:hint="@string/temperature_example"
+            android:textSize="26sp"
+            android:padding="10dp"
+            android:background="@drawable/backoutline"
+            android:layout_below="@+id/internal_temperature_label"
+            android:layout_centerHorizontal="true"
+            />
+
+        <TextView
+            android:id="@+id/external_temperature_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@string/temperature_example"
+            android:hint="@string/temperature_example"
+            android:textSize="26sp"
+            android:padding="10dp"
+            android:background="@drawable/backoutline"
+            android:layout_below="@+id/external_temperature_label"
+            android:layout_alignLeft="@id/internal_temperature_text_view"
+            android:layout_alignStart="@id/internal_temperature_text_view"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="06:59:59"
+            android:id="@+id/timer_text_view"
+            android:textSize="26sp"
+            android:padding="10dp"
+            android:layout_below="@+id/timer_label"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/internal_temperature_label"
+            android:id="@+id/internal_temperature_label"
+            android:layout_alignParentTop="true"
+            android:layout_alignLeft="@id/internal_temperature_text_view"
+            android:layout_alignStart="@id/internal_temperature_text_view"
+            android:layout_marginTop="5dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/external_temperature_label"
+            android:id="@+id/external_temperature_label"
+            android:layout_below="@id/internal_temperature_text_view"
+            android:layout_alignLeft="@id/external_temperature_text_view"
+            android:layout_alignStart="@+id/external_temperature_text_view"
+            android:layout_marginTop="39dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Timer"
+            android:id="@+id/timer_label"
+            android:layout_below="@id/external_temperature_text_view"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp" />
+
+    </RelativeLayout>
+
+
+</LinearLayout>
