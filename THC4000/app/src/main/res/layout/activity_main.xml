@@ -15,30 +15,13 @@
               tools:context="com.dncdevelopment.thc4000.MainActivity"
               tools:showIn="@layout/activity_main">
 
-    <Spinner
-        android:id="@+id/adapter_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:drawable/btn_dropdown"
-        android:spinnerMode="dropdown"
-        android:layout_gravity="center_horizontal"
-        />
-
-
     <Button
-        android:id="@+id/connect_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/connect_button"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="95dp"
-        />
-
-    <!--<Button-->
-    <!--android:id="@+id/scan_button"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="Scan for devices"-->
-    <!--android:drawableRight="@android:drawable/stat_sys_data_bluetooth"/>-->
+    android:id="@+id/start_button"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Start"
+    android:drawableRight="@android:drawable/stat_sys_data_bluetooth"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginBottom="100dp"/>
 
 </LinearLayout>
