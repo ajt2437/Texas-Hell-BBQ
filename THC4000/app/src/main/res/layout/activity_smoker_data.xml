@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/background_light"
     tools:context="com.dncdevelopment.thc4000.SmokerDataActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:paddingBottom="25dp"
         android:orientation="horizontal">
         <TextView
             android:layout_width="wrap_content"
@@ -49,14 +49,14 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/message_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textSize="20sp"
-        android:layout_marginBottom="30dp"
-        tools:text="message status here"/>
+    <!--<TextView-->
+        <!--android:id="@+id/message_status"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!--android:textSize="20sp"-->
+        <!--android:layout_marginBottom="30dp"-->
+        <!--tools:text="message status here"/>-->
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -130,13 +130,13 @@
             android:layout_below="@id/external_temperature_text_view"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp" />
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:text="Test Sound"
-            android:id="@+id/soundButton"
-            android:layout_below="@+id/timer_text_view"
-            android:layout_centerHorizontal="true"/>
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:text="Test Sound"-->
+            <!--android:id="@+id/soundButton"-->
+            <!--android:layout_below="@+id/timer_text_view"-->
+            <!--android:layout_centerHorizontal="true"/>-->
 
     </RelativeLayout>
 

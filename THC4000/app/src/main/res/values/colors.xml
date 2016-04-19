@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorTitleText">#CF5300</color>
+    <color name="colorBurnOrange">#CC5500</color>
     <color name="colorTextViewBackground">#FFFFFF</color>
     <color name="colorBorder">#808080</color>
     <color name="colorRed">#FF0000</color>

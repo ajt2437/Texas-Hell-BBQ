@@ -122,19 +122,19 @@ public class SmokerDataActivity extends AppCompatActivity {
 
 
 
-        sound_button = (Button) findViewById(R.id.soundButton);
-        sound_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (alarm_player.isPlaying()) {
-                    alarm_player.pause();
-                    alarm_player.seekTo(0);
-                } else {
-                    alarm_player.start();
-                }
-
-            }
-        });
+//        sound_button = (Button) findViewById(R.id.soundButton);
+//        sound_button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (alarm_player.isPlaying()) {
+//                    alarm_player.pause();
+//                    alarm_player.seekTo(0);
+//                } else {
+//                    alarm_player.start();
+//                }
+//
+//            }
+//        });
         alarm_player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mp) {
                 if(count==2){
@@ -180,11 +180,11 @@ public class SmokerDataActivity extends AppCompatActivity {
         //mBluetoothStatusTextView.setText("Not Connected");
 
         // Testing services
-//        boolean shouldStartAlarm = !SmokerDataService.isServiceAlarmOn(getApplicationContext(), mBluetoothDevice);
-//        SmokerDataService.setServiceAlarm(getApplicationContext(), mBluetoothDevice, shouldStartAlarm);
+        //boolean shouldStartAlarm = !SmokerDataService.isServiceAlarmOn(getApplicationContext(), mBluetoothDevice);
+        //SmokerDataService.setServiceAlarm(getApplicationContext(), mBluetoothDevice, shouldStartAlarm);
 
-        mMessageStatusTextView = (TextView) findViewById(R.id. message_status);
-        mMessageStatusTextView.setText("message shown here");
+//        mMessageStatusTextView = (TextView) findViewById(R.id. message_status);
+//        mMessageStatusTextView.setText("message shown here");
 
         mTimerTextView = (TextView) findViewById(R.id.timer_text_view);
 
@@ -422,7 +422,7 @@ public class SmokerDataActivity extends AppCompatActivity {
                             }
 
                             str += sbu;
-                            mMessageStatusTextView.setText(str);
+                            //mMessageStatusTextView.setText(str);
 
 //                            if (str.contains(Parser.startData)) {
 //                                str = "";
@@ -478,7 +478,6 @@ public class SmokerDataActivity extends AppCompatActivity {
         public void write(byte[] buffer) {
             try {
                 mOutputStream.write(buffer);
-
                 // Share the sent message back to the UI Activity
 
             } catch (IOException e) {
