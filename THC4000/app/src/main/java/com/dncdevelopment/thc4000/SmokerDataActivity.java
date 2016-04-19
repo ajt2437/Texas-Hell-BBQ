@@ -6,7 +6,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,13 +18,19 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -36,7 +46,7 @@ public class SmokerDataActivity extends AppCompatActivity {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private BluetoothDevice mBluetoothDevice;
-    private TextView mBluetoothStatusTextView;
+    //private TextView mBluetoothStatusTextView;
     private TextView mInternalTemperatureTextView;
     private TextView mExternalTemperatureTextView;
     private TextView mMessageStatusTextView;
@@ -52,6 +62,17 @@ public class SmokerDataActivity extends AppCompatActivity {
     private int timeLeft;
     private Timer mTimer = new Timer();
 
+    private Switch mySwitch;
+
+    private Spinner spinner;
+    private ArrayList<String> uriList = new ArrayList<String>();
+    private ArrayList<String> list = new ArrayList<String>();
+    private ArrayAdapter<String> mAdapter;
+    private Uri alarmaddress;
+    private MediaPlayer alarm_player;
+    private Button sound_button;
+    private int count = 0;
+
     private boolean connectedFlag = false;
 
     @Override
@@ -59,16 +80,104 @@ public class SmokerDataActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_smoker_data);
 
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        RingtoneManager manager = new RingtoneManager(this);
+        manager.setType(RingtoneManager.TYPE_ALARM);
+        Cursor cursor = manager.getCursor();
 
-        mBluetoothStatusTextView = (TextView) findViewById(R.id.bluetooth_status_text_view);
+
+        while (cursor.moveToNext()) {
+            String notificationTitle = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);
+
+            list.add(notificationTitle);
+            String id = cursor.getString(RingtoneManager.ID_COLUMN_INDEX);
+            String uri = cursor.getString(RingtoneManager.URI_COLUMN_INDEX);
+            uriList.add(uri + "/" + id);
+        }
+        mAdapter = new ArrayAdapter<>(this, R.layout.spinner_dropdown, list);
+        mAdapter.setDropDownViewResource(R.layout.spinner_dropdown);
+        spinner = (Spinner) findViewById(R.id.spinner1);
+        spinner.setAdapter(mAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                alarmaddress = Uri.parse(uriList.get(position));
+                if(alarm_player==null){
+                    alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
+                }
+                else{
+                    if (alarm_player.isPlaying()) {
+                        alarm_player.stop();
+                    }
+                    alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                //do nothing
+            }
+
+        });
+        alarmaddress = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
+
+
+
+        sound_button = (Button) findViewById(R.id.soundButton);
+        sound_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (alarm_player.isPlaying()) {
+                    alarm_player.pause();
+                    alarm_player.seekTo(0);
+                } else {
+                    alarm_player.start();
+                }
+
+            }
+        });
+        alarm_player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+                if(count==2){
+                    finish();
+                    count = 0;
+                }
+                else{
+                    count++;
+                    alarm_player.seekTo(0);
+                    alarm_player.start();
+                }
+            }
+        });
+
+        mySwitch = (Switch) findViewById(R.id.mySwitch);
+        mySwitch.setChecked(true);
+        mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                if (mySwitch.isChecked()) {
+                    //get the values of external + internal in fahrenheit
+
+                }
+                else{
+                    //convert to celsius
+                }
+            }
+        });
+
+
+
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         mInternalTemperatureTextView = (TextView) findViewById(R.id.internal_temperature_text_view);
         mExternalTemperatureTextView = (TextView) findViewById(R.id.external_temperature_text_view);
 
+
+
         //TODO: Uncomment before pushing
-        //mBluetoothDevice = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        mBluetoothStatusTextView.setText("Not Connected");
+        mBluetoothDevice = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        //mBluetoothStatusTextView.setText("Not Connected");
 
         // Testing services
 //        boolean shouldStartAlarm = !SmokerDataService.isServiceAlarmOn(getApplicationContext(), mBluetoothDevice);
@@ -87,8 +196,10 @@ public class SmokerDataActivity extends AppCompatActivity {
         //startTimer(totalTime);
 
         //TODO: Uncomment before pushing
-        //setupChat();
+        setupChat();
     }
+
+
 
     private void timerTick() {
 
@@ -235,7 +346,7 @@ public class SmokerDataActivity extends AppCompatActivity {
             mResponseHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    mBluetoothStatusTextView.setText("Connected");
+                   //mBluetoothStatusTextView.setText("Connected");
                 }
             });
             // Do work to manage the connection (in a separate thread)
@@ -332,7 +443,7 @@ public class SmokerDataActivity extends AppCompatActivity {
                                         write("-".getBytes());
                                         startTimer(dataI);
                                         break;
-
+//TODO need to extract this data into a global variable to change between C and F
                                     case Parser.startITempTag:
                                         dataD = Double.parseDouble(mMessage);
                                         dataI = (int) Math.ceil(dataD);
