@@ -31,11 +31,9 @@
             </intent-filter>
 
         </activity>
-
         <service android:name=".SmokerDataService"/>
         <activity android:name=".SmokerDataActivity"
                   android:screenOrientation="portrait">
-
         </activity>
         <activity
             android:name=".DeviceListActivity"

@@ -73,7 +73,9 @@ public class SmokerDataActivity extends AppCompatActivity {
     private Button sound_button;
     private int count = 0;
 
-    private boolean connectedFlag = false;
+    private int setTemperature;
+
+    private boolean acquiredSettings = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,21 +122,20 @@ public class SmokerDataActivity extends AppCompatActivity {
         alarmaddress = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
 
+        sound_button = (Button) findViewById(R.id.soundButton);
+        sound_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (alarm_player.isPlaying()) {
+                    alarm_player.pause();
+                    alarm_player.seekTo(0);
+                } else {
+                    alarm_player.start();
+                }
 
+            }
+        });
 
-//        sound_button = (Button) findViewById(R.id.soundButton);
-//        sound_button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (alarm_player.isPlaying()) {
-//                    alarm_player.pause();
-//                    alarm_player.seekTo(0);
-//                } else {
-//                    alarm_player.start();
-//                }
-//
-//            }
-//        });
         alarm_player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             public void onCompletion(MediaPlayer mp) {
                 if(count==2){
@@ -166,25 +167,18 @@ public class SmokerDataActivity extends AppCompatActivity {
             }
         });
 
-
-
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         mInternalTemperatureTextView = (TextView) findViewById(R.id.internal_temperature_text_view);
         mExternalTemperatureTextView = (TextView) findViewById(R.id.external_temperature_text_view);
-
-
 
         //TODO: Uncomment before pushing
         mBluetoothDevice = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         //mBluetoothStatusTextView.setText("Not Connected");
 
         // Testing services
-        //boolean shouldStartAlarm = !SmokerDataService.isServiceAlarmOn(getApplicationContext(), mBluetoothDevice);
-        //SmokerDataService.setServiceAlarm(getApplicationContext(), mBluetoothDevice, shouldStartAlarm);
-
-//        mMessageStatusTextView = (TextView) findViewById(R.id. message_status);
-//        mMessageStatusTextView.setText("message shown here");
+        // Intent i = SmokerDataService.newIntent(this, mBluetoothDevice);
+        // startService(i);
 
         mTimerTextView = (TextView) findViewById(R.id.timer_text_view);
 
@@ -193,7 +187,7 @@ public class SmokerDataActivity extends AppCompatActivity {
         }
 
         Log.i(TAG, "Background thread started");
-        //startTimer(totalTime);
+        startTimer(totalTime);
 
         //TODO: Uncomment before pushing
         setupChat();
@@ -225,6 +219,7 @@ public class SmokerDataActivity extends AppCompatActivity {
     private void startTimer(int timerValue) {
         mTimer.cancel();
         timeLeft = timerValue + 1; // Timer start with one second less so I added the second back
+        mTimerTextView.setTextColor(Color.BLACK);
         TimerTask mTicker = new TimerTask() {
             @Override
             public void run() {
@@ -273,10 +268,6 @@ public class SmokerDataActivity extends AppCompatActivity {
         mConnectThread.start();
     }
 
-    public static Intent newIntent(Context context) {
-        return new Intent(context, SmokerDataActivity.class);
-    }
-
     public static Intent newIntent(Context packageContext, BluetoothDevice device) {
         Intent i = new Intent(packageContext, SmokerDataActivity.class);
         i.putExtra(BluetoothDevice.EXTRA_DEVICE, device);
@@ -294,6 +285,8 @@ public class SmokerDataActivity extends AppCompatActivity {
     void manageConnectedSocket(BluetoothSocket socket) {
         mConnectedThread = new ConnectedThread(socket);
         mConnectedThread.start();
+        write("*".getBytes());
+
         //mBluetoothStatusTextView.setText("Connected");
     }
 
@@ -339,9 +332,6 @@ public class SmokerDataActivity extends AppCompatActivity {
                 } catch (IOException closeException) { }
                 return;
             }
-
-            //It connected successfully if it reaches this point
-            connectedFlag = true;
 
             mResponseHandler.post(new Runnable() {
                 @Override
@@ -455,7 +445,16 @@ public class SmokerDataActivity extends AppCompatActivity {
                                     case Parser.startETempTag:
                                         dataD = Double.parseDouble(mMessage);
                                         dataI = (int) Math.ceil(dataD);
-                                        mExternalTemperatureTextView.setText("" + dataI);
+
+                                        //first acquiring setting
+                                        if (!acquiredSettings) {
+                                            setTemperature = dataI;
+                                            acquiredSettings = true;
+                                        }
+                                        else {
+                                            mExternalTemperatureTextView.setText("" + dataI);
+                                        }
+
                                         write("-".getBytes());
                                         str = "";
                                         break;

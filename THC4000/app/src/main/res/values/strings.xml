@@ -9,11 +9,12 @@
     <string name="temp_text">C or F</string>
     <string name="smoker_label_text">Smoker Temperature</string>
     <string name="connect_label_button">Connect!</string>
-    <string name="internal_temperature_label">Internal Temperature</string>
-    <string name="temperature_example">600 degrees Fahrenheit</string>
-    <string name="external_temperature_label">External Temperature</string>
+    <string name="internal_temperature_label">Food Temperature</string>
+    <string name="temperature_example">201 degrees Fahrenheit</string>
+    <string name="temperature_example_2">167 degrees Fahrenheit</string>
+    <string name="external_temperature_label">Grill Temperature</string>
     <string name="wrong_device_alert">Wrong device selected</string>
-    <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Leaving Bluetooth Chat.</string>
+    <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Exiting.</string>
 
     <!--  DeviceListActivity -->
     <string name="none_paired">No devices have been paired</string>

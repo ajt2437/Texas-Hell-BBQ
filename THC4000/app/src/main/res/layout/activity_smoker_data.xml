@@ -17,6 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:text="Alarm:"
+            android:textColor="@android:color/black"
             android:id="@+id/AlarmLabel"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/spinner1"
@@ -49,15 +50,6 @@
 
     </RelativeLayout>
 
-    <!--<TextView-->
-        <!--android:id="@+id/message_status"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:textSize="20sp"-->
-        <!--android:layout_marginBottom="30dp"-->
-        <!--tools:text="message status here"/>-->
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="400dp">
@@ -66,8 +58,9 @@
             android:id="@+id/internal_temperature_text_view"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            tools:text="@string/temperature_example"
-            android:hint="@string/temperature_example"
+            tools:text="@string/temperature_example_2"
+            android:textColor="@android:color/black"
+            android:hint="@string/temperature_example_2"
             android:textSize="26sp"
             android:padding="10dp"
             android:background="@drawable/backoutline"
@@ -80,6 +73,7 @@
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             tools:text="@string/temperature_example"
+            android:textColor="@android:color/black"
             android:hint="@string/temperature_example"
             android:textSize="26sp"
             android:padding="10dp"
@@ -93,6 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="06:59:59"
+            android:textColor="@android:color/black"
             android:id="@+id/timer_text_view"
             android:textSize="26sp"
             android:padding="10dp"
@@ -104,21 +99,27 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/internal_temperature_label"
+            android:textColor="@android:color/black"
             android:id="@+id/internal_temperature_label"
             android:layout_marginTop="30dp"
             android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/external_temperature_label"
-            android:layout_alignEnd="@+id/external_temperature_label" />
+            android:layout_alignLeft="@id/internal_temperature_text_view"
+            android:layout_alignStart="@id/internal_temperature_text_view"
+            android:layout_alignRight="@id/internal_temperature_text_view"
+            android:layout_alignEnd="@id/internal_temperature_text_view" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/external_temperature_label"
+            android:textColor="@android:color/black"
             android:id="@+id/external_temperature_label"
             android:layout_below="@id/internal_temperature_text_view"
             android:layout_alignLeft="@id/external_temperature_text_view"
-            android:layout_alignStart="@+id/external_temperature_text_view"
+            android:layout_alignStart="@id/external_temperature_text_view"
+            android:layout_alignRight="@id/external_temperature_text_view"
+            android:layout_alignEnd="@id/external_temperature_text_view"
             android:layout_marginTop="39dp" />
 
         <TextView
@@ -126,17 +127,20 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Timer"
+            android:textColor="@android:color/black"
             android:id="@+id/timer_label"
             android:layout_below="@id/external_temperature_text_view"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp" />
-        <!--<Button-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="40dp"-->
-            <!--android:text="Test Sound"-->
-            <!--android:id="@+id/soundButton"-->
-            <!--android:layout_below="@+id/timer_text_view"-->
-            <!--android:layout_centerHorizontal="true"/>-->
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Test Sound"
+            android:textColor="@android:color/black"
+            android:id="@+id/soundButton"
+            android:layout_below="@+id/timer_text_view"
+            android:layout_centerHorizontal="true"/>
 
     </RelativeLayout>
 
