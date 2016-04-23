@@ -172,6 +172,8 @@ public class SmokerDataActivity extends AppCompatActivity {
         mInternalTemperatureTextView = (TextView) findViewById(R.id.internal_temperature_text_view);
         mExternalTemperatureTextView = (TextView) findViewById(R.id.external_temperature_text_view);
 
+        mMessageStatusTextView = (TextView) findViewById(R.id.message_status);
+
         //TODO: Uncomment before pushing
         mBluetoothDevice = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         //mBluetoothStatusTextView.setText("Not Connected");
@@ -187,7 +189,7 @@ public class SmokerDataActivity extends AppCompatActivity {
         }
 
         Log.i(TAG, "Background thread started");
-        startTimer(totalTime);
+        //startTimer(totalTime);
 
         //TODO: Uncomment before pushing
         setupChat();
@@ -412,7 +414,7 @@ public class SmokerDataActivity extends AppCompatActivity {
                             }
 
                             str += sbu;
-                            //mMessageStatusTextView.setText(str);
+                            mMessageStatusTextView.setText(str);
 
 //                            if (str.contains(Parser.startData)) {
 //                                str = "";

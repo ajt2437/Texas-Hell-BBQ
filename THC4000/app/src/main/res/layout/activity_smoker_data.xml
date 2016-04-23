@@ -7,6 +7,14 @@
     android:orientation="vertical"
     tools:context="com.dncdevelopment.thc4000.SmokerDataActivity">
 
+    <TextView
+        android:id="@+id/message_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="message goes here"
+        android:textSize="15dp"
+        android:gravity="center_horizontal"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
