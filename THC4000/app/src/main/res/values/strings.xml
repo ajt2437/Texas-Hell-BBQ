@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">THC4000</string>
+    <string name="action_settings">Settings</string>
+    <string name="welcome_message">Welcome \nto \nTexas Hell BBQ</string>
+    <string name="not_connected">device not connected</string>
+    <string name="connect_button">Connect</string>
+    <string name="title_activity_smoker_data">SmokerDataActivity</string>
+    <string name="food_label_text">Internal Food Temperature</string>
+    <string name="temp_text">C or F</string>
+    <string name="smoker_label_text">Smoker Temperature</string>
+    <string name="connect_label_button">Connect!</string>
+    <string name="internal_temperature_label">Food Temperature</string>
+    <string name="temperature_example">201 degrees Fahrenheit</string>
+    <string name="temperature_example_2">167 degrees Fahrenheit</string>
+    <string name="external_temperature_label">Grill Temperature</string>
+    <string name="wrong_device_alert">Wrong device selected</string>
+    <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Exiting.</string>
+
+    <!--  DeviceListActivity -->
+    <string name="none_paired">No devices have been paired</string>
+    <string name="scanning">scanning for devices...</string>
+    <string name="select_device">select a device to connect</string>
+    <string name="none_found">No devices found</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
+
+</resources>
