@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.1.1\jars\classes.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="5c5699834e9722f1c288fea2de82725d078ba127">
+        <dex dex="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-23.1.1_e69902bf3d5ff3ddaab2f777693539231aaa345a\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="518da1118f4cab8032cef06ac11c504b13eb8198">
+        <dex dex="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_64958acdab2071b25350a5bdacfb1e37f5bb8748\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\23.1.1\jars\classes.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="09c5e804bc67fc0580360043dff067df574a60d4">
+        <dex dex="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-recyclerview-v7-23.1.1_31e7925dca1c614bd10d9b0281a7012c61521244\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="127de32e31efe7a4a06b05dd5f726819bb7b8ef5">
+        <dex dex="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_c34a6b694ab2fdc9d83d75b1ad48c36bcb1ba2fc\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.1\jars\libs\internal_impl-23.1.1.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="a4de9c81ae239414e1ed0f86441b02abaf29bca9">
+        <dex dex="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-23.1.1_d6679719dc259ff74fda50c01407dde1c73c2510\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.1\jars\classes.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="6cbc7773921fcfedbe55657578f0cbfe614778dc">
+        <dex dex="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-v4-23.1.1_035e623bf062dcee83de9b36b733ac2d87627a73\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\exploded-aar\com.android.support\design\23.1.1\jars\classes.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="379471b2bd17d9737c050345c08e8c7d16589784">
+        <dex dex="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-design-23.1.1_493e2a85cb9be2df7d6ab4922084e17b746301ab\classes.dex" />
+    </item>
+    <item
+        jar="C:\Users\AbelardoJose\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.1.1\support-annotations-23.1.1.jar"
+        jumboMode="true"
+        revision="23.0.2"
+        sha1="8d680ba5a623724d1fb0e81c36a790f023a6cede">
+        <dex dex="C:\Users\AbelardoJose\Documents\Android\TexasHellBBQ\THC4000\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-23.1.1_e3bf7c01a5469a4f816002ed921ab1382d0ba44c\classes.dex" />
+    </item>
+
+</items>
