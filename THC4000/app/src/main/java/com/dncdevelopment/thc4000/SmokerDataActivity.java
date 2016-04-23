@@ -90,6 +90,8 @@ public class SmokerDataActivity extends AppCompatActivity {
         spinner = (Spinner) findViewById(R.id.spinner1);
         spinner.setAdapter(mAdapter);
 
+        mMessageStatusTextView = (TextView) findViewById(R.id.message_status);
+
 //        sound_button = (Button) findViewById(R.id.soundButton);
 //        sound_button.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -145,6 +147,7 @@ public class SmokerDataActivity extends AppCompatActivity {
         //Get Bluetooth device
         mBluetoothDevice = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         Intent i = SmokerDataService.newIntent(this, mBluetoothDevice);
+        startService(i);
         bindService(i, mConnection, Context.BIND_AUTO_CREATE);
         //startTimer(totalTime);
     }
@@ -198,15 +201,16 @@ public class SmokerDataActivity extends AppCompatActivity {
         alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
         if (mService != null) {
             mService.setAlarmPlayer(alarm_player);
+            mService.stopAlarm();
         }
-        //startTimer();
+
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
+        startTimer();
     }
 
     private void startTimer() {
@@ -228,14 +232,18 @@ public class SmokerDataActivity extends AppCompatActivity {
 
     private void timerTick() {
         // get data
-        int currentETemp = mService.getCurrentETemp();
-        int currentITemp = mService.getCurrentITemp();
-        timeLeft = mService.getTimer();
+        if (mService != null) {
+            int currentETemp = mService.getCurrentETemp();
+            int currentITemp = mService.getCurrentITemp();
+            timeLeft = mService.getTimer();
+            String message = mService.getInput();
 
-        // Assuming everything works correctly
-        mExternalTemperatureTextView.setText("" + currentETemp);
-        mInternalTemperatureTextView.setText("" + currentITemp);
-        mTimerTextView.setText(parseTimer());
+            // Assuming everything works correctly
+            mExternalTemperatureTextView.setText("" + currentETemp);
+            mInternalTemperatureTextView.setText("" + currentITemp);
+            mTimerTextView.setText(parseTimer());
+            mMessageStatusTextView.setText(message);
+        }
     }
 
     private String parseTimer() {

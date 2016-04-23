@@ -1,5 +1,6 @@
 package com.dncdevelopment.thc4000;
 
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
@@ -8,6 +9,7 @@ import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -30,6 +32,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -62,6 +65,10 @@ public class SmokerDataService extends Service {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private final IBinder mBinder = new LocalBinder();
+    private Notification notification;
+    NotificationManagerCompat notificationManager;
+    ActivityManager am;
+
 
     public class LocalBinder extends Binder {
         SmokerDataService getService() {
@@ -73,6 +80,10 @@ public class SmokerDataService extends Service {
         Intent i = new Intent(context, SmokerDataService.class);
         i.putExtra(BluetoothDevice.EXTRA_DEVICE, bluetoothDevice);
         return i;
+    }
+
+    public String getInput() {
+        return str;
     }
 
     public int getTimer() {
@@ -101,13 +112,14 @@ public class SmokerDataService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mBluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        Log.d(TAG, "Working service");
+        Log.d(TAG, "onStartCommand");
         if (mBluetoothDevice == null) {
             Log.d(TAG, "Bluetooth device not found");
             stopSelf();
 
         }
-        //setupChat();
+        notificationManager = NotificationManagerCompat.from(this);
+        setupChat();
         return START_NOT_STICKY;
     }
 
@@ -164,10 +176,29 @@ public class SmokerDataService extends Service {
 
     public void alertUser (String tag, int data) {
         Resources resources = getResources();
-        Intent i = SmokerDataActivity.newIntent(this, mBluetoothDevice);
-        PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
-        Notification notification;
-        NotificationManagerCompat notificationManager;
+        Context context = getApplicationContext();
+        ActivityManager am =(ActivityManager)context.getSystemService(context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+        ActivityManager.RunningTaskInfo task = tasks.get(0); // get current task
+        ComponentName rootActivity = task.baseActivity;
+        Intent notificationIntent;
+        PendingIntent pi;
+        if(rootActivity.getPackageName().equalsIgnoreCase("com.dncdevelopment.thc4000")) {
+            //your app is open
+            // Now build an Intent that will bring this task to the front
+            notificationIntent = new Intent();
+            notificationIntent.setComponent(rootActivity);
+            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+        }
+        else {
+            notificationIntent = new Intent();
+        }
+        notificationIntent.setAction(Intent.ACTION_MAIN);
+        notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        pi = PendingIntent.getActivity(context, 0 , notificationIntent, 0);
+
         switch (tag) {
             case Parser.startETempTag:
                 if (data > (setTemperature + 30)) {
@@ -177,19 +208,19 @@ public class SmokerDataService extends Service {
                     }
                     alarmPlayer.start();
                 }
-                break;
-            case Parser.startErrorTag:
                 notification = new NotificationCompat.Builder(this)
                         .setTicker("Check me out!")
                         .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                        .setContentTitle("ALERT!!!")
-                        .setContentText("Over here")
+                        .setContentTitle("THC-4000")
+                        .setContentText("Temperature too hig")
                         .setContentIntent(pi)
                         .setAutoCancel(true)
                         .build();
-
-                notificationManager = NotificationManagerCompat.from(this);
                 notificationManager.notify(0, notification);
+                break;
+
+            case Parser.startErrorTag:
+
                 break;
             case ALARM_DONE:
                 notification = new NotificationCompat.Builder(this)
@@ -200,9 +231,8 @@ public class SmokerDataService extends Service {
                         .setContentIntent(pi)
                         .setAutoCancel(true)
                         .build();
-
-                notificationManager = NotificationManagerCompat.from(this);
                 notificationManager.notify(0, notification);
+                break;
         }
     }
 
