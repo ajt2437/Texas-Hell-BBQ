@@ -51,6 +51,11 @@ public class SmokerDataActivity extends AppCompatActivity {
     private TextView mExternalTemperatureTextView;
     private TextView mMessageStatusTextView;
     private TextView mTimerTextView;
+    private int Ifahrenheit;
+    private int Icelsius;
+    private int Efahrenheit;
+    private int Ecelsius;
+    private Switch mySwitch;
 
     // Model
     private StringBuffer sbu;
@@ -60,9 +65,10 @@ public class SmokerDataActivity extends AppCompatActivity {
     private Handler mResponseHandler = new Handler();
     private int totalTime = 5;
     private int timeLeft;
+
     private Timer mTimer = new Timer();
 
-    private Switch mySwitch;
+
 
     private Spinner spinner;
     private ArrayList<String> uriList = new ArrayList<String>();
@@ -159,6 +165,8 @@ public class SmokerDataActivity extends AppCompatActivity {
                 if (mySwitch.isChecked()) {
                     //get the values of external + internal in fahrenheit
 
+                    //TODO: complete this before pushing
+
                 }
                 else{
                     //convert to celsius
@@ -199,6 +207,9 @@ public class SmokerDataActivity extends AppCompatActivity {
         setupChat();
     }
 
+    private int fahrenheitToCelsius(int temp){
+        return  temp = ((temp - 32)*5)/9;
+    }
 
 
     private void timerTick() {
@@ -447,7 +458,14 @@ public class SmokerDataActivity extends AppCompatActivity {
                                     case Parser.startITempTag:
                                         dataD = Double.parseDouble(mMessage);
                                         dataI = (int) Math.ceil(dataD);
-                                        mInternalTemperatureTextView.setText("" + dataI);
+                                        Ifahrenheit = dataI;
+                                        Icelsius = fahrenheitToCelsius(Ifahrenheit);
+                                        if(mySwitch.isChecked()){
+                                            mInternalTemperatureTextView.setText("" + Ifahrenheit + " degrees Fahrenheit");
+                                        }
+                                        else{
+                                            mInternalTemperatureTextView.setText("" + Icelsius + " degrees Celsius");
+                                        }
                                         write("-".getBytes());
                                         str = "";
                                         break;
@@ -455,7 +473,14 @@ public class SmokerDataActivity extends AppCompatActivity {
                                     case Parser.startETempTag:
                                         dataD = Double.parseDouble(mMessage);
                                         dataI = (int) Math.ceil(dataD);
-                                        mExternalTemperatureTextView.setText("" + dataI);
+                                        Efahrenheit = dataI;
+                                        Ecelsius = fahrenheitToCelsius(Efahrenheit);
+                                        if(mySwitch.isChecked()){
+                                            mExternalTemperatureTextView.setText("" + Efahrenheit + " degrees Fahrenheit");
+                                        }
+                                        else{
+                                            mExternalTemperatureTextView.setText("" + Ecelsius + " degrees Celsius");
+                                        }
                                         write("-".getBytes());
                                         str = "";
                                         break;
