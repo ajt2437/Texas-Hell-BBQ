@@ -387,6 +387,10 @@ public class SmokerDataActivity extends AppCompatActivity {
                     // Read from the InputStream
                     bytes = mInputStream.read(buffer);
 
+//                    try {
+//                        sleep(1000);
+//                    }
+//                    catch (InterruptedException e){}
                     // Send the obtained bytes to the UI activity
                     final int count = bytes;
                     mReceiverHandler.post(new Runnable() {
