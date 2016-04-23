@@ -159,7 +159,6 @@ public class SmokerDataActivity extends AppCompatActivity {
             SmokerDataService.LocalBinder binder = (SmokerDataService.LocalBinder) service;
             mService = binder.getService();
             mBound = true;
-            Toast.makeText(SmokerDataActivity.this, "Connected,", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -172,34 +171,36 @@ public class SmokerDataActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // Set up alarm
-        if (mService != null) {
-            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                    alarmaddress = Uri.parse(uriList.get(position));
-                    if (alarm_player == null) {
-                        alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
-                        mService.setAlarmPlayer(alarm_player);
-                    } else {
-                        if (alarm_player.isPlaying()) {
-                            alarm_player.stop();
-                        }
-                        alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
-                        mService.setAlarmPlayer(alarm_player);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                alarmaddress = Uri.parse(uriList.get(position));
+                if (alarm_player == null) {
+                    alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
+                } else {
+                    if (alarm_player.isPlaying()) {
+                        alarm_player.stop();
                     }
+                    alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
                 }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parentView) {
-                    //do nothing
+                if (mService != null) {
+                    mService.setAlarmPlayer(alarm_player);
                 }
+            }
 
-            });
-            alarmaddress = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                //do nothing
+            }
+
+        });
+        alarmaddress = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
+        if (mService != null) {
             mService.setAlarmPlayer(alarm_player);
-            startTimer();
         }
+        //startTimer();
+
     }
 
     @Override
