@@ -15,6 +15,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,6 +45,7 @@ public class SmokerDataActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter = null;
     private static final String TAG = "SmokerDataActivity";
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private static final int REQUEST_CODE_DEVICE = 0;
 
     // View
     private BluetoothDevice mBluetoothDevice;
@@ -144,12 +146,37 @@ public class SmokerDataActivity extends AppCompatActivity {
 
         Log.i(TAG, "Background thread started");
 
+        if (savedInstanceState != null) {
+            mBluetoothDevice = savedInstanceState.getParcelable(BluetoothDevice.EXTRA_DEVICE);
+        }
+        else {
+            mBluetoothDevice = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        }
+
         //Get Bluetooth device
-        mBluetoothDevice = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        Intent i = SmokerDataService.newIntent(this, mBluetoothDevice);
-        startService(i);
-        bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+        if (mService == null && mBluetoothDevice != null) {
+
+            Intent i = SmokerDataService.newIntent(this, mBluetoothDevice, 0);
+            startService(i);
+            bindService(i, mConnection, Context.BIND_AUTO_CREATE);
+        }
         //startTimer(totalTime);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelable(BluetoothDevice.EXTRA_DEVICE, mBluetoothDevice);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_DEVICE) {
+            Log.d(TAG, "got bluetooth device");
+            mBluetoothDevice = data.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        }
+
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
@@ -187,7 +214,7 @@ public class SmokerDataActivity extends AppCompatActivity {
                     alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
                 }
                 if (mService != null) {
-                    mService.setAlarmPlayer(alarm_player);
+                    mService.setAlarmPlayer(position);
                 }
             }
 
@@ -200,7 +227,7 @@ public class SmokerDataActivity extends AppCompatActivity {
         alarmaddress = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
         if (mService != null) {
-            mService.setAlarmPlayer(alarm_player);
+            mService.setAlarmPlayer(0);
             mService.stopAlarm();
         }
 
@@ -241,6 +268,21 @@ public class SmokerDataActivity extends AppCompatActivity {
             // Assuming everything works correctly
             mExternalTemperatureTextView.setText("" + currentETemp);
             mInternalTemperatureTextView.setText("" + currentITemp);
+
+            if (timeLeft == 0) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    mTimerTextView.setTextColor(Color.RED);
+                    Animation animation = new AlphaAnimation(0.0f, 1.0f);
+                    animation.setDuration(500);
+                    animation.setStartOffset(20);
+                    animation.setRepeatMode(Animation.REVERSE);
+                    animation.setRepeatCount(5);
+                    mTimerTextView.startAnimation(animation);
+                }
+            }
+            else {
+                mTimerTextView.setTextColor(Color.BLACK);
+            }
             mTimerTextView.setText(parseTimer());
             mMessageStatusTextView.setText(message);
         }

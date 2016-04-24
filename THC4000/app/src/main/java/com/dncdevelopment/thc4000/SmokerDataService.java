@@ -14,8 +14,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -32,6 +36,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -44,8 +49,10 @@ import java.util.UUID;
 public class SmokerDataService extends Service {
     private static final String TAG = "SmokerDataService";
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private static final String EXTRA_MEDIA = "MediaPlayer";
+    private static final String EXTRA_MEDIA_POSITION = "MediaPlayer";
     private static final String ALARM_DONE = "AlarmDone";
+    private static final String EXTRA_TEMP = "Temperature";
+    private static final String EXTRA_MESSAGE = "AlertMessage";
 
     // Model
     private StringBuffer sbu;
@@ -67,7 +74,8 @@ public class SmokerDataService extends Service {
     private final IBinder mBinder = new LocalBinder();
     private Notification notification;
     NotificationManagerCompat notificationManager;
-    ActivityManager am;
+    private ArrayList<String> uriList = new ArrayList<String>();
+    int setRingtone;
 
 
     public class LocalBinder extends Binder {
@@ -76,9 +84,10 @@ public class SmokerDataService extends Service {
         }
     }
 
-    public static Intent newIntent(Context context, BluetoothDevice bluetoothDevice) {
+    public static Intent newIntent(Context context, BluetoothDevice bluetoothDevice, int position) {
         Intent i = new Intent(context, SmokerDataService.class);
         i.putExtra(BluetoothDevice.EXTRA_DEVICE, bluetoothDevice);
+        i.putExtra(EXTRA_MEDIA_POSITION, position);
         return i;
     }
 
@@ -98,8 +107,8 @@ public class SmokerDataService extends Service {
         return currentITemp;
     }
 
-    public void setAlarmPlayer (MediaPlayer alert) {
-        alarmPlayer = alert;
+    public void setAlarmPlayer (int position) {
+        setRingtone = position;
     }
 
     public void stopAlarm() {
@@ -112,12 +121,13 @@ public class SmokerDataService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mBluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        setRingtone = intent.getIntExtra(EXTRA_MEDIA_POSITION, 0);
         Log.d(TAG, "onStartCommand");
         if (mBluetoothDevice == null) {
             Log.d(TAG, "Bluetooth device not found");
             stopSelf();
-
         }
+        alarmPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(uriList.get(setRingtone)));
         notificationManager = NotificationManagerCompat.from(this);
         setupChat();
         return START_NOT_STICKY;
@@ -127,6 +137,15 @@ public class SmokerDataService extends Service {
     public void onCreate() {
         Log.d(TAG, "onCreate");
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        RingtoneManager manager = new RingtoneManager(this);
+        manager.setType(RingtoneManager.TYPE_ALARM);
+        Cursor cursor = manager.getCursor();
+
+        while (cursor.moveToNext()) {
+            String id = cursor.getString(RingtoneManager.ID_COLUMN_INDEX);
+            String uri = cursor.getString(RingtoneManager.URI_COLUMN_INDEX);
+            uriList.add(uri + "/" + id);
+        }
     }
 
     @Override
@@ -169,67 +188,85 @@ public class SmokerDataService extends Service {
             if (timeLeft == 0) {
                 mTimer.cancel();
                 // TODO: notify the user and play ringtone
-                alertUser(ALARM_DONE, 0);
+                alertUser(ALARM_DONE, null);
             }
         }
     }
 
-    public void alertUser (String tag, int data) {
+    public void alertUser (String tag, Intent data) {
         Resources resources = getResources();
-        Context context = getApplicationContext();
-        ActivityManager am =(ActivityManager)context.getSystemService(context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+        Context context = getBaseContext();
+        //getApplicationContext();
+        ActivityManager am = (ActivityManager)context.getSystemService(context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(10);
         ActivityManager.RunningTaskInfo task = tasks.get(0); // get current task
-        ComponentName rootActivity = task.baseActivity;
-        Intent notificationIntent;
+        ComponentName topActivity = task.topActivity;
+        Intent notificationIntent = new Intent();
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setTicker("Check me out!")
+                .setContentTitle("THC-4000")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSound(Uri.parse(uriList.get(setRingtone)))
+                .setAutoCancel(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
+
         PendingIntent pi;
-        if(rootActivity.getPackageName().equalsIgnoreCase("com.dncdevelopment.thc4000")) {
-            //your app is open
-            // Now build an Intent that will bring this task to the front
-            notificationIntent = new Intent();
-            notificationIntent.setComponent(rootActivity);
-            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+        boolean found = false;
+
+        for (int i = 0; i < tasks.size(); i++)
+        {
+            task = tasks.get(i);
+            topActivity = task.topActivity;
+            String packageName = topActivity.getPackageName();
+            if(packageName.equalsIgnoreCase("com.dncdevelopment.thc4000")) {
+                //your app is open
+                // Now build an Intent that will bring this task to the front
+
+                //gets the top activity from root activity
+
+                notificationIntent = SmokerDataActivity.newIntent(context, mBluetoothDevice);
+                notificationIntent.setComponent(topActivity);
+                notificationIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+                break;
+            }
         }
-        else {
-            notificationIntent = new Intent();
-        }
+
+        //Testing
+        //notificationIntent = new Intent();
+        notificationIntent.setComponent(topActivity);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
         notificationIntent.setAction(Intent.ACTION_MAIN);
         notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-        pi = PendingIntent.getActivity(context, 0 , notificationIntent, 0);
+        pi = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationBuilder.setContentIntent(pi);
 
         switch (tag) {
             case Parser.startETempTag:
-                if (data > (setTemperature + 30)) {
-                    if (alarmPlayer.isPlaying()) {
-                        alarmPlayer.pause();
-                        alarmPlayer.seekTo(0);
-                    }
-                    alarmPlayer.start();
+                int currentTemp = data.getIntExtra(EXTRA_TEMP, 0);
+                if (currentTemp > (setTemperature + 30)) {
+
+                    notification = notificationBuilder
+                            .setContentText("Temperature too high")
+                            .build();
+                    notificationManager.notify(0, notification);
                 }
-                notification = new NotificationCompat.Builder(this)
-                        .setTicker("Check me out!")
-                        .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                        .setContentTitle("THC-4000")
-                        .setContentText("Temperature too hig")
-                        .setContentIntent(pi)
-                        .setAutoCancel(true)
-                        .build();
-                notificationManager.notify(0, notification);
                 break;
 
             case Parser.startErrorTag:
-
+                String message = data.getStringExtra(EXTRA_MESSAGE);
+                notification = notificationBuilder
+                        .setContentText(message)
+                        .build();
+                notificationManager.notify(0, notification);
                 break;
             case ALARM_DONE:
-                notification = new NotificationCompat.Builder(this)
-                        .setTicker("Check me out!")
-                        .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                        .setContentTitle("ALERT!!!")
-                        .setContentText("Over here")
-                        .setContentIntent(pi)
-                        .setAutoCancel(true)
+                notification = notificationBuilder
+                        .setContentText("Food is ready")
                         .build();
                 notificationManager.notify(0, notification);
                 break;
@@ -361,9 +398,8 @@ public class SmokerDataService extends Service {
                                 mMessage = parseResult[1];
                                 int dataI;
                                 double dataD;
+                                Intent data = new Intent();
                                 switch (parseResult[0]) {
-                                    //double dataD;
-
                                     case Parser.startTimeTag:
                                         dataI = Integer.parseInt(mMessage);
                                         write("-".getBytes());
@@ -389,7 +425,8 @@ public class SmokerDataService extends Service {
                                         }
                                         else {
                                             currentETemp = dataI;
-                                            alertUser(Parser.startETempTag, dataI);
+                                            data.putExtra(EXTRA_TEMP, dataI);
+                                            alertUser(Parser.startETempTag, data);
                                         }
 
                                         write("-".getBytes());
@@ -397,7 +434,7 @@ public class SmokerDataService extends Service {
                                         break;
 
                                     case Parser.startErrorTag:
-
+                                        data.putExtra(EXTRA_MESSAGE, mMessage);
                                         break;
                                 }
                             }

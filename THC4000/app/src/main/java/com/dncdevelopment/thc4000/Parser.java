@@ -5,9 +5,11 @@ package com.dncdevelopment.thc4000;
  */
 public class Parser {
 
-    public static final String HOT_TEMPERATURE = "Hey the Smoker is going way to high!!";
-    public static final String LOW_TEMPERATURE = "Hey the Smoker is going way to low!!";
-    public static final String FOOD_READY = "Hey the Smoker is going way to high!!";
+    public static final String HOT_TEMPERATURE = "Overheating";
+    public static final String LOW_TEMPERATURE = "Add more fuel to the smoker";
+//    public static final String FOOD_READY = "Hey the Smoker is going way to high!!";
+    public static final String TOO_HOT_ERROR = "0";
+    public static final String TOO_COLD_ERROR = "1";
 
     public static final String startData = "Data";
     public static final String startTimeTag = "Time";
@@ -79,14 +81,11 @@ public class Parser {
     private static String userHandler(String[] token){
         String message; //need to declare constants to print out messages
         switch(token[1]){
-            case "TemperatureHigh":
+            case TOO_HOT_ERROR:
                 message = HOT_TEMPERATURE;
                 break;
-            case "TemperatureLow":
+            case TOO_COLD_ERROR:
                 message = LOW_TEMPERATURE;
-                break;
-            case "FoodReady":
-                message = FOOD_READY;
                 break;
             default:
                 message = "Invalid Error message sent";
