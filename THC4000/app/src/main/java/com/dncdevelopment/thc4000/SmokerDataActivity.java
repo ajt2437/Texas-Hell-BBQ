@@ -71,6 +71,12 @@ public class SmokerDataActivity extends AppCompatActivity {
     private Timer mTimer = new Timer();
     private Handler mReceiveHandler = new Handler();
 
+    //temperatureVars
+    private int Ifahrenheit;
+    private int Icelsius;
+    private int Efahrenheit;
+    private int Ecelsius;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,11 +136,13 @@ public class SmokerDataActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 if (mySwitch.isChecked()) {
-                    //get the values of external + internal in fahrenheit
-
+                    //TODO: check if switch is working
+                    mExternalTemperatureTextView.setText("" + Efahrenheit + "degrees Fahrenheit");
+                    mInternalTemperatureTextView.setText("" + Ifahrenheit + "degrees Fahrenheit");
                 }
                 else{
-                    //convert to celsius
+                    mExternalTemperatureTextView.setText("" + Ecelsius + "degrees Celsius");
+                    mInternalTemperatureTextView.setText("" + Icelsius + "degrees Celsius");
                 }
             }
         });
@@ -261,9 +269,11 @@ public class SmokerDataActivity extends AppCompatActivity {
         // get data
         if (mService != null) {
             int currentETemp = mService.getCurrentETemp();
+
             int currentITemp = mService.getCurrentITemp();
             timeLeft = mService.getTimer();
             String message = mService.getInput();
+
 
             // Assuming everything works correctly
             mExternalTemperatureTextView.setText("" + currentETemp);
@@ -282,6 +292,21 @@ public class SmokerDataActivity extends AppCompatActivity {
             }
             else {
                 mTimerTextView.setTextColor(Color.BLACK);
+            }
+
+            //TODO: check if switch is working
+            Efahrenheit = currentETemp;
+            Ifahrenheit = currentITemp;
+            Ecelsius = ((Efahrenheit - 32)*5)/9;
+            Icelsius = ((Ifahrenheit - 32)*5)/9;
+            if(mySwitch.isChecked()){
+                mExternalTemperatureTextView.setText("" + Efahrenheit + "degrees Fahrenheit");
+                mInternalTemperatureTextView.setText("" + Ifahrenheit + "degrees Fahrenheit");
+            }
+            else{
+                mExternalTemperatureTextView.setText("" + Ecelsius + "degrees Celsius");
+                mInternalTemperatureTextView.setText("" + Icelsius + "degrees Celsius");
+
             }
             mTimerTextView.setText(parseTimer());
             mMessageStatusTextView.setText(message);

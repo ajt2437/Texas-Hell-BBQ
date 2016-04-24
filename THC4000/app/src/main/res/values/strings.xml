@@ -10,8 +10,8 @@
     <string name="smoker_label_text">Smoker Temperature</string>
     <string name="connect_label_button">Connect!</string>
     <string name="internal_temperature_label">Food Temperature</string>
-    <string name="temperature_example">201 degrees Fahrenheit</string>
-    <string name="temperature_example_2">167 degrees Fahrenheit</string>
+    <string name="temperature_example">--------------</string>
+    <string name="temperature_example_2">--------------</string>
     <string name="external_temperature_label">Grill Temperature</string>
     <string name="wrong_device_alert">Wrong device selected</string>
     <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Exiting.</string>
