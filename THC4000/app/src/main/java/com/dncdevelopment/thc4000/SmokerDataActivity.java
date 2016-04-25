@@ -71,11 +71,14 @@ public class SmokerDataActivity extends AppCompatActivity {
     private Timer mTimer = new Timer();
     private Handler mReceiveHandler = new Handler();
 
+
     //temperatureVars
     private int Ifahrenheit;
     private int Icelsius;
     private int Efahrenheit;
     private int Ecelsius;
+    private int spinnerPosition = 0;
+    private String SAVED_SPINNER = "my saved spinner";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +100,7 @@ public class SmokerDataActivity extends AppCompatActivity {
         mAdapter.setDropDownViewResource(R.layout.spinner_dropdown);
         spinner = (Spinner) findViewById(R.id.spinner1);
         spinner.setAdapter(mAdapter);
-
+        //TODO:LOAD CORRECT MEDIA PLAYER
         mMessageStatusTextView = (TextView) findViewById(R.id.message_status);
 
 //        sound_button = (Button) findViewById(R.id.soundButton);
@@ -156,9 +159,12 @@ public class SmokerDataActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             mBluetoothDevice = savedInstanceState.getParcelable(BluetoothDevice.EXTRA_DEVICE);
+            spinnerPosition = savedInstanceState.getInt(SAVED_SPINNER);
         }
         else {
             mBluetoothDevice = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            spinnerPosition = 0;
+
         }
 
         //Get Bluetooth device
@@ -175,6 +181,7 @@ public class SmokerDataActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putParcelable(BluetoothDevice.EXTRA_DEVICE, mBluetoothDevice);
+        savedInstanceState.putInt(SAVED_SPINNER, spinnerPosition);
 
     }
 
@@ -213,6 +220,7 @@ public class SmokerDataActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 alarmaddress = Uri.parse(uriList.get(position));
+                spinnerPosition = position;
                 if (alarm_player == null) {
                     alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
                 } else {
@@ -232,8 +240,9 @@ public class SmokerDataActivity extends AppCompatActivity {
             }
 
         });
-        alarmaddress = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        alarmaddress = Uri.parse(uriList.get(spinnerPosition));
         alarm_player = MediaPlayer.create(getApplicationContext(), alarmaddress);
+        spinner.setSelection(spinnerPosition);
         if (mService != null) {
             mService.setAlarmPlayer(0);
             mService.stopAlarm();
