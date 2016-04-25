@@ -12,9 +12,10 @@ public class Parser {
     public static final String TOO_COLD_ERROR = "1";
 
     public static final String startData = "Data";
-    public static final String startTimeTag = "Time";
-    public static final String startITempTag = "ITemp";
-    public static final String startETempTag = "ETemp";
+    public static final String startTimeTag = "A";
+    public static final String startITempTag = "I";
+    public static final String startETempTag = "E";
+    public static final String startSetTag = "S";
     public static final String startErrorTag = "Error";
 
 
@@ -50,26 +51,25 @@ public class Parser {
                         result[0] = startTimeTag;
                         result[1] = token[1];
                     }
+                    break;
+                case startSetTag:
+                    if (token[2].equals("/" + startSetTag)) {
+                        result[0] = startSetTag;
+                        result[1] = token[1];
+                    }
+                    break;
                 case startITempTag:
                     if (token[2].equals("/" + startITempTag)) {
                         result[0] = startITempTag;
                         result[1] = token[1];
                     }
+                    break;
                 case startETempTag:
                     if (token[2].equals("/" + startETempTag)) {
                         result[0] = startETempTag;
                         result[1] = token[1];
                     }
                     break;
-                case startErrorTag:
-                    if (token[2].equals("/" + startErrorTag)) {
-                        message = userHandler(token);
-                        result[0] = startErrorTag;
-                        result[1] = message;
-                    }
-                    break;
-                default:
-
             }
         }
         return result;

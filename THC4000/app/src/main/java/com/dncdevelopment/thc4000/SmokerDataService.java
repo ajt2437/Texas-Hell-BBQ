@@ -76,6 +76,7 @@ public class SmokerDataService extends Service {
     NotificationManagerCompat notificationManager;
     private ArrayList<String> uriList = new ArrayList<String>();
     int setRingtone;
+    private boolean startConditionCheck = false;
 
 
     public class LocalBinder extends Binder {
@@ -248,25 +249,32 @@ public class SmokerDataService extends Service {
         switch (tag) {
             case Parser.startETempTag:
                 int currentTemp = data.getIntExtra(EXTRA_TEMP, 0);
-                if (currentTemp > (setTemperature + 30)) {
-
-                    notification = notificationBuilder
-                            .setContentText("Temperature too high")
-                            .build();
-                    notificationManager.notify(0, notification);
+                if( currentTemp >= setTemperature){
+                    startConditionCheck = true;
                 }
-                break;
+                if(startConditionCheck) {
+                    //Temperature is too high
+                    if (currentTemp > (setTemperature + 30)) {
 
-            case Parser.startErrorTag:
-                String message = data.getStringExtra(EXTRA_MESSAGE);
-                notification = notificationBuilder
-                        .setContentText(message)
-                        .build();
-                notificationManager.notify(0, notification);
+                        notification = notificationBuilder
+                                .setContentTitle("Temperature increasing rapidly")
+                                .setContentText("Possible fire hazard")
+                                .build();
+                        notificationManager.notify(0, notification);
+                    }
+                    else if(currentTemp < (setTemperature - 50)) {
+                        notification = notificationBuilder
+                                .setContentTitle("Temperature dropped too low")
+                                .setContentText("Add more fuel")
+                                .build();
+                        notificationManager.notify(0, notification);
+                    }
+                }
                 break;
             case ALARM_DONE:
                 notification = notificationBuilder
-                        .setContentText("Food is ready")
+                        .setContentTitle("Food is ready")
+                        .setContentText("Time to eat!")
                         .build();
                 notificationManager.notify(0, notification);
                 break;
@@ -334,6 +342,8 @@ public class SmokerDataService extends Service {
         private final InputStream mInputStream;
         private final OutputStream mOutputStream;
         private String parseResult[];
+        private boolean isTimeSet = false;
+        private boolean isTempSet = false;
 
         public ConnectedThread(BluetoothSocket socket) {
             mSocket = socket;
@@ -359,9 +369,13 @@ public class SmokerDataService extends Service {
 
             // Keep listening to the InputStream until an exception occurs
             while (true) {
+                if (!isTimeSet || !isTempSet) {
+                    write("*". getBytes());
+                }
                 try {
                     // Read from the InputStream
                     bytes = mInputStream.read(buffer);
+
 
                     // Send the obtained bytes to the UI activity
                     final int count = bytes;
@@ -401,9 +415,18 @@ public class SmokerDataService extends Service {
                                 Intent data = new Intent();
                                 switch (parseResult[0]) {
                                     case Parser.startTimeTag:
+                                        isTimeSet = true;
                                         dataI = Integer.parseInt(mMessage);
                                         write("-".getBytes());
                                         startTimer(dataI);
+                                        str = "";
+                                        break;
+                                    case Parser.startSetTag:
+                                        isTempSet = true;
+                                        dataI = Integer.parseInt(mMessage);
+                                        setTemperature = dataI;
+                                        write("-".getBytes());
+                                        str = "";
                                         break;
 //TODO need to extract this data into a global variable to change between C and F
                                     case Parser.startITempTag:
@@ -413,29 +436,16 @@ public class SmokerDataService extends Service {
                                         write("-".getBytes());
                                         str = "";
                                         break;
-
                                     case Parser.startETempTag:
                                         dataD = Double.parseDouble(mMessage);
                                         dataI = (int) Math.ceil(dataD);
-
-                                        //first acquiring setting
-                                        if (!acquiredSettings) {
-                                            setTemperature = dataI;
-                                            acquiredSettings = true;
-                                        }
-                                        else {
-                                            currentETemp = dataI;
-                                            data.putExtra(EXTRA_TEMP, dataI);
-                                            alertUser(Parser.startETempTag, data);
-                                        }
-
+                                        currentETemp = dataI;
+                                        data.putExtra(EXTRA_TEMP, dataI);
+                                        alertUser(Parser.startETempTag, data);
                                         write("-".getBytes());
                                         str = "";
                                         break;
 
-                                    case Parser.startErrorTag:
-                                        data.putExtra(EXTRA_MESSAGE, mMessage);
-                                        break;
                                 }
                             }
 

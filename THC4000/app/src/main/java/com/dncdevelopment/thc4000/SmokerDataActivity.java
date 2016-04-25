@@ -137,12 +137,12 @@ public class SmokerDataActivity extends AppCompatActivity {
                                          boolean isChecked) {
                 if (mySwitch.isChecked()) {
                     //TODO: check if switch is working
-                    mExternalTemperatureTextView.setText("" + Efahrenheit + "degrees Fahrenheit");
-                    mInternalTemperatureTextView.setText("" + Ifahrenheit + "degrees Fahrenheit");
+                    mExternalTemperatureTextView.setText("" + Efahrenheit + " degrees Fahrenheit");
+                    mInternalTemperatureTextView.setText("" + Ifahrenheit + " degrees Fahrenheit");
                 }
                 else{
-                    mExternalTemperatureTextView.setText("" + Ecelsius + "degrees Celsius");
-                    mInternalTemperatureTextView.setText("" + Icelsius + "degrees Celsius");
+                    mExternalTemperatureTextView.setText("" + Ecelsius + " degrees Celsius");
+                    mInternalTemperatureTextView.setText("" + Icelsius + " degrees Celsius");
                 }
             }
         });
@@ -274,11 +274,6 @@ public class SmokerDataActivity extends AppCompatActivity {
             timeLeft = mService.getTimer();
             String message = mService.getInput();
 
-
-            // Assuming everything works correctly
-            mExternalTemperatureTextView.setText("" + currentETemp);
-            mInternalTemperatureTextView.setText("" + currentITemp);
-
             if (timeLeft == 0) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     mTimerTextView.setTextColor(Color.RED);
@@ -300,12 +295,12 @@ public class SmokerDataActivity extends AppCompatActivity {
             Ecelsius = ((Efahrenheit - 32)*5)/9;
             Icelsius = ((Ifahrenheit - 32)*5)/9;
             if(mySwitch.isChecked()){
-                mExternalTemperatureTextView.setText("" + Efahrenheit + "degrees Fahrenheit");
-                mInternalTemperatureTextView.setText("" + Ifahrenheit + "degrees Fahrenheit");
+                mExternalTemperatureTextView.setText("" + Efahrenheit + " degrees Fahrenheit");
+                mInternalTemperatureTextView.setText("" + Ifahrenheit + " degrees Fahrenheit");
             }
             else{
-                mExternalTemperatureTextView.setText("" + Ecelsius + "degrees Celsius");
-                mInternalTemperatureTextView.setText("" + Icelsius + "degrees Celsius");
+                mExternalTemperatureTextView.setText("" + Ecelsius + " degrees Celsius");
+                mInternalTemperatureTextView.setText("" + Icelsius + " degrees Celsius");
 
             }
             mTimerTextView.setText(parseTimer());
