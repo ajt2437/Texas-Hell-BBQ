@@ -11,26 +11,12 @@ public class Parser {
     public static final String TOO_HOT_ERROR = "0";
     public static final String TOO_COLD_ERROR = "1";
 
-    public static final String startData = "Data";
     public static final String startTimeTag = "A";
     public static final String startITempTag = "I";
     public static final String startETempTag = "E";
     public static final String startSetTag = "S";
-    public static final String startErrorTag = "Error";
+    public static final String dumpTag = "Dump";
 
-
-    public static boolean foundDataTag (String bluetoothInput) {
-        int i = 0;
-        int inputLen = bluetoothInput.length();
-        int dataLen = startData.length();
-        while (i + dataLen < inputLen) {
-            String context = bluetoothInput.substring(i, i + dataLen);
-            if (startData.equals(context)) {
-                return true;
-            }
-        }
-        return false;
-    }
     public static String[] stringHandler(String bluetoothInput){
         //need to parse first
         String[] token = new String[4];
@@ -41,7 +27,7 @@ public class Parser {
         token = bluetoothInput.split(",");
         //double data = 0.0;	//this is not how we will use the result... maybe write dummy variables as
         String message;
-        if (token.length > 2) {
+        if (token.length == 3) {
             switch (token[0]) {
 			/*
 			 * can change the structure easily in here;
@@ -70,6 +56,17 @@ public class Parser {
                         result[1] = token[1];
                     }
                     break;
+            }
+        }
+        else if (token.length > 3) {
+            result[0] = dumpTag;
+            result[1] = "0";
+        }
+
+        if (result[0] != null) {
+            if (result[1].isEmpty()) {
+                result[0] = null;
+                result[1] = null;
             }
         }
         return result;

@@ -1,8 +1,6 @@
 package com.dncdevelopment.thc4000;
 
 import android.app.ActivityManager;
-import android.app.AlarmManager;
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -12,26 +10,19 @@ import android.bluetooth.BluetoothSocket;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -76,8 +67,15 @@ public class SmokerDataService extends Service {
     NotificationManagerCompat notificationManager;
     private ArrayList<String> uriList = new ArrayList<String>();
     int setRingtone;
+    int ETempCount = 0;
+    int prevETemp = 0;
+    int ITempCount = 0;
+    int prevITemp = 0;
+    int ATimeCount = 0;
+    int prevAValue = 0;
+    private boolean isTimeSet = false;
+    private boolean isTempSet = false;
     private boolean startConditionCheck = false;
-
 
     public class LocalBinder extends Binder {
         SmokerDataService getService() {
@@ -153,7 +151,6 @@ public class SmokerDataService extends Service {
     public void onDestroy() {
         super.onDestroy();
         mConnectThread.cancel();
-        //mParserHandler.quit();
         Log.i(TAG, "Background thread destroyed");
     }
 
@@ -204,8 +201,7 @@ public class SmokerDataService extends Service {
         ComponentName topActivity = task.topActivity;
         Intent notificationIntent = new Intent();
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setTicker("Check me out!")
-                .setContentTitle("THC-4000")
+                .setTicker("THC-4000")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setSound(Uri.parse(uriList.get(setRingtone)))
                 .setAutoCancel(true);
@@ -249,22 +245,24 @@ public class SmokerDataService extends Service {
         switch (tag) {
             case Parser.startETempTag:
                 int currentTemp = data.getIntExtra(EXTRA_TEMP, 0);
-                if( currentTemp >= setTemperature){
-                    startConditionCheck = true;
+                if (isTimeSet && isTempSet) {
+                    if(currentTemp >= setTemperature){
+                        startConditionCheck = true;
+                    }
                 }
                 if(startConditionCheck) {
                     //Temperature is too high
-                    if (currentTemp > (setTemperature + 30)) {
+                    if (currentTemp > (setTemperature + 50)) {
 
                         notification = notificationBuilder
-                                .setContentTitle("Temperature increasing rapidly")
+                                .setContentTitle("Food overheating")
                                 .setContentText("Possible fire hazard")
                                 .build();
                         notificationManager.notify(0, notification);
                     }
                     else if(currentTemp < (setTemperature - 50)) {
                         notification = notificationBuilder
-                                .setContentTitle("Temperature dropped too low")
+                                .setContentTitle("Food undercooked")
                                 .setContentText("Add more fuel")
                                 .build();
                         notificationManager.notify(0, notification);
@@ -341,9 +339,10 @@ public class SmokerDataService extends Service {
         private final BluetoothSocket mSocket;
         private final InputStream mInputStream;
         private final OutputStream mOutputStream;
-        private String parseResult[];
-        private boolean isTimeSet = false;
-        private boolean isTempSet = false;
+        public static final char startTimeTag = 'A';
+        public static final char startITempTag = 'I';
+        public static final char startETempTag = 'E';
+        public static final char startSetTag = 'S';
 
         public ConnectedThread(BluetoothSocket socket) {
             mSocket = socket;
@@ -364,8 +363,8 @@ public class SmokerDataService extends Service {
         }
 
         public void run() {
-            final byte[] buffer = new byte[1024]; // buffer store for the stream
-            int bytes; // bytes returned from read()
+            int startTag;
+            int dataChar;
 
             // Keep listening to the InputStream until an exception occurs
             while (true) {
@@ -374,83 +373,60 @@ public class SmokerDataService extends Service {
                 }
                 try {
                     // Read from the InputStream
-                    bytes = mInputStream.read(buffer);
-
-
-                    // Send the obtained bytes to the UI activity
-                    final int count = bytes;
-                    mReceiverHandler.post(new Runnable() {
-                        public void run() {
-
-                            // String input together
-                            StringBuilder b = new StringBuilder();
-                            for (int i = 0; i < count; ++i) {
-                                String s = Integer.toString(buffer[i]);
-                                b.append(s);
-                                b.append(",");
-                            }
-
-                            String s = b.toString();
-                            String[] chars = s.split(",");
-                            sbu = new StringBuffer();
-                            for (int i = 0; i < chars.length; i++) {
-                                char currentChar = (char) Integer.parseInt(chars[i]);
-                                if (currentChar != ' ' && currentChar != '\n' && currentChar != '\b' && currentChar != '\t') {
-                                    sbu.append((char) Integer.parseInt(chars[i]));
-                                } else {
-                                    sbu.setLength(0);
-                                    str = "";
-                                }
-                            }
-
-                            str += sbu;
-                            // Parse data, identify start and stop tag to know we received all the data to display
-                            parseResult = Parser.stringHandler(str);
-
-                            if (parseResult[0] != null) {
-                                // Identify the tag and take the correction action
-                                mMessage = parseResult[1];
-                                int dataI;
-                                double dataD;
-                                Intent data = new Intent();
-                                switch (parseResult[0]) {
-                                    case Parser.startTimeTag:
-                                        isTimeSet = true;
-                                        dataI = Integer.parseInt(mMessage);
-                                        write("-".getBytes());
-                                        startTimer(dataI);
-                                        str = "";
-                                        break;
-                                    case Parser.startSetTag:
-                                        isTempSet = true;
-                                        dataI = Integer.parseInt(mMessage);
-                                        setTemperature = dataI;
-                                        write("-".getBytes());
-                                        str = "";
-                                        break;
-//TODO need to extract this data into a global variable to change between C and F
-                                    case Parser.startITempTag:
-                                        dataD = Double.parseDouble(mMessage);
-                                        dataI = (int) Math.ceil(dataD);
-                                        currentITemp = dataI;
-                                        write("-".getBytes());
-                                        str = "";
-                                        break;
-                                    case Parser.startETempTag:
-                                        dataD = Double.parseDouble(mMessage);
-                                        dataI = (int) Math.ceil(dataD);
-                                        currentETemp = dataI;
-                                        data.putExtra(EXTRA_TEMP, dataI);
-                                        alertUser(Parser.startETempTag, data);
-                                        write("-".getBytes());
-                                        str = "";
-                                        break;
-
-                                }
-                            }
-
+                    while((startTag = mInputStream.read()) == -1){
+                    }
+                    while((dataChar = mInputStream.read()) != startTag){
+                        if(dataChar != -1){
+                            str += (char) dataChar;
                         }
-                    });
+                    }
+
+                    // Identify the tag and take the correction action
+                    int dataI;
+                    Intent data = new Intent();
+                    dataI = Integer.parseInt(str);
+                    switch (startTag) {
+                        case startTimeTag:
+                            startTimer(dataI);
+                            write("-".getBytes());
+                            str = "";
+                            isTimeSet = true;
+                            break;
+                        case startSetTag:
+                            if (dataI > 999) {
+                                str = "";
+                                break;
+                            }
+                            if (isTempSet) {
+                                acquiredSettings = false;
+                            }
+                            write("-".getBytes());
+                            setTemperature = dataI;
+                            isTempSet = true;
+                            str = "";
+                            break;
+
+                        case startITempTag:
+                            if (dataI > 999) {
+                                str = "";
+                                break;
+                            }
+                            write("-".getBytes());
+                            currentITemp = dataI;
+                            str = "";
+                            break;
+                        case startETempTag:
+                            if (dataI > 999) {
+                                str = "";
+                                break;
+                            }
+                            write("-".getBytes());
+                            currentETemp = dataI;
+                            data.putExtra(EXTRA_TEMP, dataI);
+                            alertUser(Parser.startETempTag, data);
+                            str = "";
+                            break;
+                    }
                 }
                 catch (IOException e) {
                     break;

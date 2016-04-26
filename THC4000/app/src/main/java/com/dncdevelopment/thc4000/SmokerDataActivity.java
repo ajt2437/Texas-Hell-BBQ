@@ -70,6 +70,7 @@ public class SmokerDataActivity extends AppCompatActivity {
     boolean mBound = false;
     private Timer mTimer = new Timer();
     private Handler mReceiveHandler = new Handler();
+    private final static int INTERVAL = 500;
 
     //temperatureVars
     private int Ifahrenheit;
@@ -262,7 +263,7 @@ public class SmokerDataActivity extends AppCompatActivity {
             }
         };
         mTimer = new Timer();
-        mTimer.scheduleAtFixedRate(mTicker, 0, 1000);
+        mTimer.scheduleAtFixedRate(mTicker, 0, INTERVAL);
     }
 
     private void timerTick() {
