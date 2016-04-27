@@ -51,7 +51,6 @@ public class SmokerDataActivity extends AppCompatActivity {
     private BluetoothDevice mBluetoothDevice;
     private TextView mInternalTemperatureTextView;
     private TextView mExternalTemperatureTextView;
-    private TextView mMessageStatusTextView;
     private TextView mTimerTextView;
     private Switch mySwitch;
 
@@ -62,16 +61,12 @@ public class SmokerDataActivity extends AppCompatActivity {
     private ArrayAdapter<String> mAdapter;
     private Uri alarmaddress;
     private MediaPlayer alarm_player;
-    private Button sound_button;
-    private int count = 0;
-    private int totalTime = 5;
     private int timeLeft;
     SmokerDataService mService;
     boolean mBound = false;
     private Timer mTimer = new Timer();
     private Handler mReceiveHandler = new Handler();
     private final static int INTERVAL = 500;
-
 
     //temperatureVars
     private int Ifahrenheit;
@@ -102,35 +97,6 @@ public class SmokerDataActivity extends AppCompatActivity {
         spinner = (Spinner) findViewById(R.id.spinner1);
         spinner.setAdapter(mAdapter);
         //TODO:LOAD CORRECT MEDIA PLAYER
-        mMessageStatusTextView = (TextView) findViewById(R.id.message_status);
-
-//        sound_button = (Button) findViewById(R.id.soundButton);
-//        sound_button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (alarm_player.isPlaying()) {
-//                    alarm_player.pause();
-//                    alarm_player.seekTo(0);
-//                } else {
-//                    alarm_player.start();
-//                }
-//
-//            }
-//        });
-
-//        alarm_player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//            public void onCompletion(MediaPlayer mp) {
-//                if(count==2){
-//                    finish();
-//                    count = 0;
-//                }
-//                else{
-//                    count++;
-//                    alarm_player.seekTo(0);
-//                    alarm_player.start();
-//                }
-//            }
-//        });
 
         mySwitch = (Switch) findViewById(R.id.mySwitch);
         mySwitch.setChecked(true);
@@ -246,7 +212,6 @@ public class SmokerDataActivity extends AppCompatActivity {
         spinner.setSelection(spinnerPosition);
         if (mService != null) {
             mService.setAlarmPlayer(0);
-            mService.stopAlarm();
         }
 
 
@@ -284,19 +249,19 @@ public class SmokerDataActivity extends AppCompatActivity {
             timeLeft = mService.getTimer();
             String message = mService.getInput();
 
-            if (timeLeft == 0) {
+            if (timeLeft == 0 && mService.isTimeSet()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     mTimerTextView.setTextColor(Color.RED);
                     Animation animation = new AlphaAnimation(0.0f, 1.0f);
                     animation.setDuration(500);
                     animation.setStartOffset(20);
                     animation.setRepeatMode(Animation.REVERSE);
-                    animation.setRepeatCount(5);
+                    animation.setRepeatCount(1);
                     mTimerTextView.startAnimation(animation);
                 }
             }
             else {
-                mTimerTextView.setTextColor(Color.BLACK);
+                mTimerTextView.setTextColor(Color.GRAY);
             }
 
             //TODO: check if switch is working
@@ -314,7 +279,6 @@ public class SmokerDataActivity extends AppCompatActivity {
 
             }
             mTimerTextView.setText(parseTimer());
-            mMessageStatusTextView.setText(message);
         }
     }
 

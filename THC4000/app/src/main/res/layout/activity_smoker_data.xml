@@ -7,12 +7,6 @@
     android:orientation="vertical"
     tools:context="com.dncdevelopment.thc4000.SmokerDataActivity">
 
-    <TextView
-        android:id="@+id/message_status"
-        android:text="message goes here"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -65,7 +59,7 @@
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             tools:text="@string/temperature_example_2"
-            android:textColor="@android:color/black"
+            android:textColor="@color/gray"
             android:hint="@string/temperature_example_2"
             android:textSize="26sp"
             android:padding="10dp"
@@ -79,7 +73,7 @@
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             tools:text="@string/temperature_example"
-            android:textColor="@android:color/black"
+            android:textColor="@color/gray"
             android:hint="@string/temperature_example"
             android:textSize="26sp"
             android:padding="10dp"
@@ -93,7 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="06:59:59"
-            android:textColor="@android:color/black"
+            android:textColor="@color/gray"
             android:id="@+id/timer_text_view"
             android:textSize="26sp"
             android:padding="10dp"

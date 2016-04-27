@@ -2,6 +2,7 @@ package com.dncdevelopment.thc4000;
 
 import android.app.ActivityManager;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -19,6 +20,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.service.notification.StatusBarNotification;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -64,7 +66,7 @@ public class SmokerDataService extends Service {
     private ConnectedThread mConnectedThread;
     private final IBinder mBinder = new LocalBinder();
     private Notification notification;
-    NotificationManagerCompat notificationManager;
+    NotificationManager notificationManager;
     private ArrayList<String> uriList = new ArrayList<String>();
     int setRingtone;
     int ETempCount = 0;
@@ -110,11 +112,8 @@ public class SmokerDataService extends Service {
         setRingtone = position;
     }
 
-    public void stopAlarm() {
-        if (alarmPlayer.isPlaying()) {
-            alarmPlayer.pause();
-            alarmPlayer.seekTo(0);
-        }
+    public boolean isTimeSet() {
+        return isTimeSet;
     }
 
     @Override
@@ -127,7 +126,7 @@ public class SmokerDataService extends Service {
             stopSelf();
         }
         alarmPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(uriList.get(setRingtone)));
-        notificationManager = NotificationManagerCompat.from(this);
+        notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         setupChat();
         return START_NOT_STICKY;
     }
@@ -210,6 +209,10 @@ public class SmokerDataService extends Service {
             notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
 
+        StatusBarNotification notifications[] = null;
+        boolean foundFireTag = false;
+        boolean foundColdTag = false;
+
         PendingIntent pi;
         boolean found = false;
 
@@ -221,7 +224,6 @@ public class SmokerDataService extends Service {
             if(packageName.equalsIgnoreCase("com.dncdevelopment.thc4000")) {
                 //your app is open
                 // Now build an Intent that will bring this task to the front
-
                 //gets the top activity from root activity
 
                 notificationIntent = SmokerDataActivity.newIntent(context, mBluetoothDevice);
@@ -242,6 +244,26 @@ public class SmokerDataService extends Service {
         pi = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         notificationBuilder.setContentIntent(pi);
 
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
+           notifications = notificationManager.getActiveNotifications();
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (notifications != null) {
+                for (int i = 0; i < notifications.length; i++) {
+                    if (foundFireTag && foundColdTag) {
+                        break;
+                    }
+                    if (notifications[i].getTag().equals("Fire")) {
+                        foundFireTag = true;
+                    }
+                    else if (notifications[i].getTag().equals("Cold")) {
+                        foundColdTag = true;
+                    }
+                }
+            }
+        }
+
         switch (tag) {
             case Parser.startETempTag:
                 int currentTemp = data.getIntExtra(EXTRA_TEMP, 0);
@@ -251,21 +273,22 @@ public class SmokerDataService extends Service {
                     }
                 }
                 if(startConditionCheck) {
+
                     //Temperature is too high
-                    if (currentTemp > (setTemperature + 50)) {
+                    if (currentTemp > (setTemperature + 50) && !foundFireTag) {
 
                         notification = notificationBuilder
                                 .setContentTitle("Food overheating")
                                 .setContentText("Possible fire hazard")
                                 .build();
-                        notificationManager.notify(0, notification);
+                        notificationManager.notify( "Fire", 0, notification);
                     }
-                    else if(currentTemp < (setTemperature - 50)) {
+                    else if(currentTemp < (setTemperature - 50) && !foundColdTag) {
                         notification = notificationBuilder
                                 .setContentTitle("Food undercooked")
                                 .setContentText("Add more fuel")
                                 .build();
-                        notificationManager.notify(0, notification);
+                        notificationManager.notify("Cold", 1, notification);
                     }
                 }
                 break;
@@ -274,7 +297,7 @@ public class SmokerDataService extends Service {
                         .setContentTitle("Food is ready")
                         .setContentText("Time to eat!")
                         .build();
-                notificationManager.notify(0, notification);
+                notificationManager.notify(2, notification);
                 break;
         }
     }
@@ -373,8 +396,7 @@ public class SmokerDataService extends Service {
                 }
                 try {
                     // Read from the InputStream
-                    while((startTag = mInputStream.read()) == -1){
-                    }
+                    while((startTag = mInputStream.read()) == -1){}
                     while((dataChar = mInputStream.read()) != startTag){
                         if(dataChar != -1){
                             str += (char) dataChar;
@@ -382,10 +404,20 @@ public class SmokerDataService extends Service {
                     }
 
                     // Identify the tag and take the correction action
-                    int dataI;
+                    int dataI = 0;
                     Intent data = new Intent();
-                    dataI = Integer.parseInt(str);
+//                    dataI = Integer.parseInt(str);
+                    try {
+                        dataI = Integer.parseInt(str);
+                    }
+                    catch (NumberFormatException e) {
+                        System.out.println("Input data: " + (char) startTag + " " + dataI);
+                        str = "";
+                        startTag = 0;
+                    }
                     switch (startTag) {
+                        case 0:
+                            break;
                         case startTimeTag:
                             startTimer(dataI);
                             write("-".getBytes());
@@ -393,13 +425,13 @@ public class SmokerDataService extends Service {
                             isTimeSet = true;
                             break;
                         case startSetTag:
-                            if (dataI > 999) {
-                                str = "";
-                                break;
-                            }
-                            if (isTempSet) {
-                                acquiredSettings = false;
-                            }
+//                            if (dataI > 999) {
+//                                str = "";
+//                                break;
+//                            }
+//                            if (isTempSet) {
+//                                acquiredSettings = false;
+//                            }
                             write("-".getBytes());
                             setTemperature = dataI;
                             isTempSet = true;
@@ -407,19 +439,19 @@ public class SmokerDataService extends Service {
                             break;
 
                         case startITempTag:
-                            if (dataI > 999) {
-                                str = "";
-                                break;
-                            }
+//                            if (dataI > 999) {
+//                                str = "";
+//                                break;
+//                            }
                             write("-".getBytes());
                             currentITemp = dataI;
                             str = "";
                             break;
                         case startETempTag:
-                            if (dataI > 999) {
-                                str = "";
-                                break;
-                            }
+//                            if (dataI > 999) {
+//                                str = "";
+//                                break;
+//                            }
                             write("-".getBytes());
                             currentETemp = dataI;
                             data.putExtra(EXTRA_TEMP, dataI);
